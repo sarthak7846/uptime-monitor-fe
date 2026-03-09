@@ -4,16 +4,19 @@ export type Monitor = {
     url: string;
     method: string;
     lastStatus: MonitorState;
-    interval: string;
+    interval: number;
     consecutiveFailures: number;
     consecutiveSuccesses: number;
     createdAt: Date;
     userId: string;
     // lastChecked: string;
-    timeout: string
+    timeout: number
 };
 
-
+export type CreateMonitorState = {
+    monitors: Monitor[];
+    error?: string | null;
+}
 
 export type HttpMethod = "GET" | "POST" | "HEAD";
 export type MonitorState = "PENDING" | "UP" | "DOWN";
@@ -22,7 +25,7 @@ export type CreateMonitorForm = {
     name: string;
     url: string;
     method: HttpMethod;
-    lastStatus: "" | MonitorState;
+    lastStatus?: MonitorState;
     interval: number;
     timeout: number;
 };

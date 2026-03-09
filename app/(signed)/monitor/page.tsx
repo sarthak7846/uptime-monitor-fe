@@ -1,12 +1,16 @@
 import MonitorClient from "./MonitorClient";
 import { apiFetch } from "@/lib/api";
+import { CreateMonitorState } from "./types";
 
 const MonitorPage = async () => {
   const res = await apiFetch('/monitor/all');
-  const monitors = await res.json();
+  const monitors = res;
+  const initialMonitorState: CreateMonitorState = {
+    monitors
+  };
 
   return (
-    <MonitorClient initialMonitors={monitors}/>
+    <MonitorClient initialMonitorState={initialMonitorState} />
   )
 }
 

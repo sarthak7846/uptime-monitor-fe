@@ -16,9 +16,12 @@ export const apiFetch = async (path: string, requestInit?: RequestInit) => {
         }
     });
 
+    const resJson = await res.json();
+
     if (!res.ok) {
-        throw new Error('Failed to load monitors');
+        // throw new Error('Failed to load monitors');
+        console.log(resJson.error, resJson.message)
     }
 
-    return res;
+    return resJson;
 }

@@ -6,12 +6,6 @@ import { redirect } from "next/navigation";
 
 export async function signInAction(_: any, formData: FormData) {
   try {
-    console.log(
-      "server func invoked",
-      formData,
-      typeof formData,
-      process.env.API_BASE_URL
-    );
     const email = formData.get("email");
     const password = formData.get("password");
 

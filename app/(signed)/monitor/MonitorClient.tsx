@@ -1,18 +1,18 @@
 'use client'
 
-import { FormEvent, useState } from "react";
-import { CreateMonitorForm, HttpMethod, Monitor, MonitorState } from "./types";
+import { FormEvent, useActionState, useState } from "react";
+import { CreateMonitorForm, CreateMonitorState, HttpMethod, Monitor, MonitorState } from "./types";
+import { createMonitorAction } from "./actions";
 
-const MonitorClient = ({ initialMonitors }: {
-    initialMonitors: Monitor[]
+const MonitorClient = ({ initialMonitorState }: {
+    initialMonitorState: CreateMonitorState
 }) => {
-    const [monitors, setMonitors] = useState(initialMonitors);
+    const [state, action, pending] = useActionState(createMonitorAction, initialMonitorState);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [createForm, setCreateForm] = useState<CreateMonitorForm>({
         name: "",
         url: "",
         method: "GET",
-        lastStatus: "",
         interval: 60,
         timeout: 5,
     });
@@ -45,7 +45,6 @@ const MonitorClient = ({ initialMonitors }: {
             name: "",
             url: "",
             method: "GET",
-            lastStatus: "",
             interval: 60,
             timeout: 5,
         });
@@ -132,7 +131,7 @@ const MonitorClient = ({ initialMonitors }: {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border bg-card">
-                        {monitors.map((monitor) => (
+                        {state.monitors.map((monitor) => (
                             <tr key={monitor.id} className="hover:bg-muted/40">
                                 <td className="px-4 py-3 align-top">
                                     <div className="flex flex-col">
@@ -196,7 +195,7 @@ const MonitorClient = ({ initialMonitors }: {
                     </tbody>
                 </table>
 
-                {monitors.length === 0 && (
+                {state.monitors.length === 0 && (
                     <div className="px-6 py-10 text-center text-sm text-muted-foreground">
                         No monitors yet. Click{" "}
                         <span className="font-medium text-foreground">New monitor</span> to create your first one.
@@ -247,7 +246,7 @@ const MonitorClient = ({ initialMonitors }: {
                             </button>
                         </div>
 
-                        <form className="space-y-4" onSubmit={handleCreateSubmit}>
+                        <form className="space-y-4" action={action}>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-1.5 sm:col-span-2">
                                     <label
@@ -262,9 +261,9 @@ const MonitorClient = ({ initialMonitors }: {
                                         type="text"
                                         placeholder="Marketing site"
                                         value={createForm.name}
-                                        onChange={(event) =>
-                                            setCreateForm((prev) => ({ ...prev, name: event.target.value }))
-                                        }
+                                        // onChange={(event) =>
+                                        //     setCreateForm((prev) => ({ ...prev, name: event.target.value }))
+                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                     <p className="text-[11px] text-muted-foreground">
@@ -286,9 +285,9 @@ const MonitorClient = ({ initialMonitors }: {
                                         required
                                         placeholder="https://example.com/health"
                                         value={createForm.url}
-                                        onChange={(event) =>
-                                            setCreateForm((prev) => ({ ...prev, url: event.target.value }))
-                                        }
+                                        // onChange={(event) =>
+                                        //     setCreateForm((prev) => ({ ...prev, url: event.target.value }))
+                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                 </div>
@@ -304,12 +303,12 @@ const MonitorClient = ({ initialMonitors }: {
                                         id="method"
                                         name="method"
                                         value={createForm.method}
-                                        onChange={(event) =>
-                                            setCreateForm((prev) => ({
-                                                ...prev,
-                                                method: event.target.value as HttpMethod,
-                                            }))
-                                        }
+                                        // onChange={(event) =>
+                                        //     setCreateForm((prev) => ({
+                                        //         ...prev,
+                                        //         method: event.target.value as HttpMethod,
+                                        //     }))
+                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                         <option value="GET">GET</option>
@@ -329,12 +328,12 @@ const MonitorClient = ({ initialMonitors }: {
                                         id="lastStatus"
                                         name="lastStatus"
                                         value={createForm.lastStatus}
-                                        onChange={(event) =>
-                                            setCreateForm((prev) => ({
-                                                ...prev,
-                                                lastStatus: event.target.value as "" | MonitorState,
-                                            }))
-                                        }
+                                        // onChange={(event) =>
+                                        //     setCreateForm((prev) => ({
+                                        //         ...prev,
+                                        //         lastStatus: event.target.value as "" | MonitorState,
+                                        //     }))
+                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                         <option value="">Not set</option>
@@ -361,12 +360,12 @@ const MonitorClient = ({ initialMonitors }: {
                                         min={5}
                                         step={5}
                                         value={createForm.interval}
-                                        onChange={(event) =>
-                                            setCreateForm((prev) => ({
-                                                ...prev,
-                                                interval: Number(event.target.value) || 0,
-                                            }))
-                                        }
+                                        // onChange={(event) =>
+                                        //     setCreateForm((prev) => ({
+                                        //         ...prev,
+                                        //         interval: Number(event.target.value) || 0,
+                                        //     }))
+                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                 </div>
@@ -385,12 +384,12 @@ const MonitorClient = ({ initialMonitors }: {
                                         min={1}
                                         step={1}
                                         value={createForm.timeout}
-                                        onChange={(event) =>
-                                            setCreateForm((prev) => ({
-                                                ...prev,
-                                                timeout: Number(event.target.value) || 0,
-                                            }))
-                                        }
+                                        // onChange={(event) =>
+                                        //     setCreateForm((prev) => ({
+                                        //         ...prev,
+                                        //         timeout: Number(event.target.value) || 0,
+                                        //     }))
+                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                 </div>
@@ -404,13 +403,14 @@ const MonitorClient = ({ initialMonitors }: {
                                         resetCreateForm();
                                     }}
                                     className="inline-flex items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    disabled={pending}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                                    disabled={!createForm.url}
+                                    disabled={!createForm.url || pending}
                                 >
                                     Create monitor
                                 </button>
