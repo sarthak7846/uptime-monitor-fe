@@ -1,23 +1,28 @@
 'use server'
 
 import { apiFetch } from "@/lib/api";
-import { CreateMonitorForm, CreateMonitorState } from "./types";
+import { CreateMonitorState } from "./types";
+import { createMonitorSchema } from "./schema";
 
 export const createMonitorAction = async (prev: CreateMonitorState, formData: FormData) => {
-    try {
-        // console.log('formdata for create monitor', formData.entries().map((item) => item));
-        // const data = formData.entries();
-        const data:any = {};
-        for (const [key, value] of formData.entries()) {
-            console.log(key, value, typeof value);
-            data[key] = value;
-          }
+    try {       
+        const parsed = createMonitorSchema.safeParse(Object.fromEntries(formData));
 
-          console.log('data', data)
+        if(!parsed.success) {
+            return {
+                ...prev,
+                error: parsed.error
+            }
+        }
+
+        console.log('data', parsed)
+
         const res = await apiFetch('/monitor',{
             method: 'POST',
-            body: data
+            body: parsed.data as any
         });
+
+        console.log('res', res)
 
         return prev;
     } catch (error: any) {

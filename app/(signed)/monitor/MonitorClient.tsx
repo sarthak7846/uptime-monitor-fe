@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useActionState, useState } from "react";
-import { CreateMonitorForm, CreateMonitorState, HttpMethod, Monitor, MonitorState } from "./types";
+import { CreateMonitorState, HttpMethod, Monitor, MonitorState } from "./types";
 import { createMonitorAction } from "./actions";
 
 const MonitorClient = ({ initialMonitorState }: {
@@ -9,13 +9,13 @@ const MonitorClient = ({ initialMonitorState }: {
 }) => {
     const [state, action, pending] = useActionState(createMonitorAction, initialMonitorState);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [createForm, setCreateForm] = useState<CreateMonitorForm>({
-        name: "",
-        url: "",
-        method: "GET",
-        interval: 60,
-        timeout: 5,
-    });
+    // const [createForm, setCreateForm] = useState<CreateMonitorForm>({
+    //     name: "",
+    //     url: "",
+    //     method: "GET",
+    //     interval: 60,
+    //     timeout: 5,
+    // });
 
     const handleUpdate = (monitor: Monitor) => {
         // TODO: Wire this up to your update flow (drawer / modal / separate page)
@@ -41,13 +41,13 @@ const MonitorClient = ({ initialMonitorState }: {
     };
 
     const resetCreateForm = () => {
-        setCreateForm({
-            name: "",
-            url: "",
-            method: "GET",
-            interval: 60,
-            timeout: 5,
-        });
+        // setCreateForm({
+        //     name: "",
+        //     url: "",
+        //     method: "GET",
+        //     interval: 60,
+        //     timeout: 5,
+        // });
     };
 
     const handleCreateSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -210,7 +210,7 @@ const MonitorClient = ({ initialMonitorState }: {
                         aria-hidden
                         onClick={() => {
                             setIsCreateOpen(false);
-                            resetCreateForm();
+                            // resetCreateForm();
                         }}
                     />
 
@@ -237,7 +237,7 @@ const MonitorClient = ({ initialMonitorState }: {
                                 type="button"
                                 onClick={() => {
                                     setIsCreateOpen(false);
-                                    resetCreateForm();
+                                    // resetCreateForm();
                                 }}
                                 className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 aria-label="Close"
@@ -260,10 +260,6 @@ const MonitorClient = ({ initialMonitorState }: {
                                         name="name"
                                         type="text"
                                         placeholder="Marketing site"
-                                        value={createForm.name}
-                                        // onChange={(event) =>
-                                        //     setCreateForm((prev) => ({ ...prev, name: event.target.value }))
-                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                     <p className="text-[11px] text-muted-foreground">
@@ -284,10 +280,6 @@ const MonitorClient = ({ initialMonitorState }: {
                                         type="url"
                                         required
                                         placeholder="https://example.com/health"
-                                        value={createForm.url}
-                                        // onChange={(event) =>
-                                        //     setCreateForm((prev) => ({ ...prev, url: event.target.value }))
-                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                 </div>
@@ -302,13 +294,6 @@ const MonitorClient = ({ initialMonitorState }: {
                                     <select
                                         id="method"
                                         name="method"
-                                        value={createForm.method}
-                                        // onChange={(event) =>
-                                        //     setCreateForm((prev) => ({
-                                        //         ...prev,
-                                        //         method: event.target.value as HttpMethod,
-                                        //     }))
-                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                         <option value="GET">GET</option>
@@ -327,13 +312,6 @@ const MonitorClient = ({ initialMonitorState }: {
                                     <select
                                         id="lastStatus"
                                         name="lastStatus"
-                                        value={createForm.lastStatus}
-                                        // onChange={(event) =>
-                                        //     setCreateForm((prev) => ({
-                                        //         ...prev,
-                                        //         lastStatus: event.target.value as "" | MonitorState,
-                                        //     }))
-                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     >
                                         <option value="">Not set</option>
@@ -359,13 +337,6 @@ const MonitorClient = ({ initialMonitorState }: {
                                         type="number"
                                         min={5}
                                         step={5}
-                                        value={createForm.interval}
-                                        // onChange={(event) =>
-                                        //     setCreateForm((prev) => ({
-                                        //         ...prev,
-                                        //         interval: Number(event.target.value) || 0,
-                                        //     }))
-                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                 </div>
@@ -383,13 +354,6 @@ const MonitorClient = ({ initialMonitorState }: {
                                         type="number"
                                         min={1}
                                         step={1}
-                                        value={createForm.timeout}
-                                        // onChange={(event) =>
-                                        //     setCreateForm((prev) => ({
-                                        //         ...prev,
-                                        //         timeout: Number(event.target.value) || 0,
-                                        //     }))
-                                        // }
                                         className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     />
                                 </div>
@@ -400,7 +364,7 @@ const MonitorClient = ({ initialMonitorState }: {
                                     type="button"
                                     onClick={() => {
                                         setIsCreateOpen(false);
-                                        resetCreateForm();
+                                        // resetCreateForm();
                                     }}
                                     className="inline-flex items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                     disabled={pending}
@@ -409,8 +373,8 @@ const MonitorClient = ({ initialMonitorState }: {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                                    disabled={!createForm.url || pending}
+                                    className="inline-flex items-center cursor-pointer justify-center rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                                    disabled={pending}
                                 >
                                     Create monitor
                                 </button>

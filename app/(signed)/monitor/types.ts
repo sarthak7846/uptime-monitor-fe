@@ -20,12 +20,3 @@ export type CreateMonitorState = {
 
 export type HttpMethod = "GET" | "POST" | "HEAD";
 export type MonitorState = "PENDING" | "UP" | "DOWN";
-
-export type CreateMonitorForm = {
-    name: string;
-    url: string;
-    method: HttpMethod;
-    lastStatus?: MonitorState;
-    interval: number;
-    timeout: number;
-};
