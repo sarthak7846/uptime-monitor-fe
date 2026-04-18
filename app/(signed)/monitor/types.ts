@@ -1,9 +1,9 @@
 export type Monitor = {
-    id: number;
+    id: string;
     name: string;
     url: string;
     method: string;
-    lastStatus: MonitorState;
+    lastStatus: MonitorStatus;
     interval: number;
     consecutiveFailures: number;
     consecutiveSuccesses: number;
@@ -13,10 +13,10 @@ export type Monitor = {
     timeout: number
 };
 
-export type CreateMonitorState = {
+export type MonitorState = {
     monitors: Monitor[];
     error?: string | null;
 }
 
 export type HttpMethod = "GET" | "POST" | "HEAD";
-export type MonitorState = "PENDING" | "UP" | "DOWN";
+export type MonitorStatus = "PENDING" | "UP" | "DOWN";

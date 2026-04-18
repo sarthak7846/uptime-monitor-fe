@@ -25,7 +25,7 @@ export const apiFetch = async (path: string, requestInit?: RequestInit) => {
     const resJson = await res.json();
 
     if (!res.ok) {
-        console.log(resJson.error, resJson.message);
+        throw new Error(resJson)
     }
 
     return resJson;

@@ -1,13 +1,14 @@
 'use client'
 
 import { FormEvent, useActionState, useState } from "react";
-import { CreateMonitorState, HttpMethod, Monitor, MonitorState } from "./types";
-import { createMonitorAction } from "./actions";
+import { MonitorState, Monitor, MonitorStatus } from "./types";
+import { createMonitorAction, deleteMonitorAction } from "./actions";
 
 const MonitorClient = ({ initialMonitorState }: {
-    initialMonitorState: CreateMonitorState
+    initialMonitorState: MonitorState
 }) => {
     const [state, action, pending] = useActionState(createMonitorAction, initialMonitorState);
+    const [deleteState, deleteAction] = useActionState(deleteMonitorAction, state);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     // const [createForm, setCreateForm] = useState<CreateMonitorForm>({
     //     name: "",
@@ -22,12 +23,11 @@ const MonitorClient = ({ initialMonitorState }: {
         console.log("Update monitor", monitor);
     };
 
-    const handleDelete = (id: number) => {
-        // TODO: Replace with real delete action + confirmation
-        // setMonitors((current) => current.filter((m) => m.id !== id));
+    const handleDelete = async (id: number) => {
+
     };
 
-    const getStatusStyles = (status: MonitorState) => {
+    const getStatusStyles = (status: MonitorStatus) => {
         switch (status) {
             case 'UP':
                 return "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300";
@@ -92,6 +92,8 @@ const MonitorClient = ({ initialMonitorState }: {
 
                 <button
                     type="button"
+                    name="intent"
+                    value="create"
                     onClick={() => setIsCreateOpen(true)}
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
@@ -100,8 +102,8 @@ const MonitorClient = ({ initialMonitorState }: {
                 </button>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-                <table className="min-w-full divide-y divide-border text-sm">
+            <div className="overflow-x-auto rounded-xl border border-border bg-card">
+                <table className="min-w-full divide-y divide-border text-sm ">
                     <thead className="bg-muted/50">
                         <tr>
                             <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -181,13 +183,18 @@ const MonitorClient = ({ initialMonitorState }: {
                                         >
                                             Update
                                         </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDelete(monitor.id)}
-                                            className="inline-flex items-center justify-center rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground shadow-sm transition-colors hover:bg-destructive/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
-                                        >
-                                            Delete
-                                        </button>
+                                        <form action={deleteAction}>
+                                            <input type="hidden" name="id" value={monitor.id}/>
+                                            <button
+                                                type="submit"
+                                                name="intent"
+                                                value="delete"
+                                                className="inline-flex items-center justify-center rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground shadow-sm transition-colors hover:bg-destructive/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+                                            >
+                                                Delete
+                                            </button>
+                                        </form>
+
                                     </div>
                                 </td>
                             </tr>
@@ -202,6 +209,8 @@ const MonitorClient = ({ initialMonitorState }: {
                     </div>
                 )}
             </div>
+
+            {state.error && <div className="text-red-500">{JSON.stringify(state.error)}</div>}
 
             {isCreateOpen && (
                 <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
