@@ -16,7 +16,13 @@ export type Monitor = {
 export type MonitorState = {
     monitors: Monitor[];
     error?: string | null;
+    lastAction?: MonitorActionIntent;
+    success?: boolean;
 }
 
+export enum MonitorActionIntent {
+    CREATE = 'create',
+    DELETE = 'delete'
+}
 export type HttpMethod = "GET" | "POST" | "HEAD";
 export type MonitorStatus = "PENDING" | "UP" | "DOWN";
