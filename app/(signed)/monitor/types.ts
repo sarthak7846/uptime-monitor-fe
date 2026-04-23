@@ -20,9 +20,12 @@ export type MonitorState = {
     success?: boolean;
 }
 
+export type ModalState = { mode: 'closed' } | { mode: 'create' } | { mode: 'edit'; monitor: Monitor }
+
 export enum MonitorActionIntent {
     CREATE = 'create',
-    DELETE = 'delete'
+    DELETE = 'delete',
+    UPDATE = 'update'
 }
 export type HttpMethod = "GET" | "POST" | "HEAD";
 export type MonitorStatus = "PENDING" | "UP" | "DOWN";

@@ -1,15 +1,17 @@
-import { MonitorActionIntent } from "@/app/(signed)/monitor/types";
+import { Monitor, MonitorActionIntent } from "@/app/(signed)/monitor/types";
 
 const MonitorForm = ({
-    setIsCreateOpen,
     action,
     pending,
-    intent
+    intent,
+    monitor,
+    onClose,
 }: {
-    setIsCreateOpen: (data: boolean) => void;
     action: (payload: FormData) => void;
     pending: boolean;
-    intent: MonitorActionIntent
+    intent: MonitorActionIntent;
+    monitor?: Monitor;
+    onClose: () => void;
 }) => {
     return (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40 px-4">
@@ -17,8 +19,7 @@ const MonitorForm = ({
                 className="absolute inset-0"
                 aria-hidden
                 onClick={() => {
-                    setIsCreateOpen(false);
-                    // resetCreateForm();
+                    onClose();
                 }}
             />
 
@@ -34,7 +35,7 @@ const MonitorForm = ({
                             id="create-monitor-title"
                             className="text-base font-semibold tracking-tight text-foreground"
                         >
-                            Create monitor
+                            {intent === MonitorActionIntent.CREATE ? 'Create monitor': "Edit monitor"}
                         </h2>
                         <p className="mt-1 text-xs text-muted-foreground">
                             Configure a new uptime monitor for your service.
@@ -44,8 +45,7 @@ const MonitorForm = ({
                     <button
                         type="button"
                         onClick={() => {
-                            setIsCreateOpen(false);
-                            // resetCreateForm();
+                            onClose();
                         }}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         aria-label="Close"
@@ -55,7 +55,8 @@ const MonitorForm = ({
                 </div>
 
                 <form className="space-y-4" action={action}>
-                    <input type="hidden" name="intent" value="create" />
+                    <input type="hidden" name="intent" value={intent === MonitorActionIntent.CREATE ? 'create' : 'update'} />
+                    {intent === MonitorActionIntent.UPDATE && monitor?.id && <input type="hidden" name="id" value={monitor.id} />}
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="space-y-1.5 sm:col-span-2">
                             <label
@@ -68,6 +69,7 @@ const MonitorForm = ({
                                 id="name"
                                 name="name"
                                 type="text"
+                                defaultValue={monitor?.name ?? ''}
                                 placeholder="Marketing site"
                                 className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             />
@@ -87,6 +89,7 @@ const MonitorForm = ({
                                 id="url"
                                 name="url"
                                 type="url"
+                                defaultValue={monitor?.url ?? ''}
                                 required
                                 placeholder="https://example.com/health"
                                 className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -104,6 +107,7 @@ const MonitorForm = ({
                                 id="method"
                                 name="method"
                                 className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                defaultValue={monitor?.method ?? ''}
                             >
                                 <option value="GET">GET</option>
                                 <option value="POST">POST</option>
@@ -122,6 +126,7 @@ const MonitorForm = ({
                                 id="lastStatus"
                                 name="lastStatus"
                                 className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                defaultValue={monitor?.lastStatus ?? ''}
                             >
                                 <option value="">Not set</option>
                                 <option value="PENDING">PENDING</option>
@@ -145,6 +150,7 @@ const MonitorForm = ({
                                 name="interval"
                                 type="number"
                                 min={1000}
+                                defaultValue={monitor?.interval ?? ''}
                                 className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             />
                         </div>
@@ -161,7 +167,7 @@ const MonitorForm = ({
                                 name="timeout"
                                 type="number"
                                 min={1}
-                                step={1}
+                                defaultValue={monitor?.timeout ?? ''}
                                 className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             />
                         </div>
@@ -171,8 +177,7 @@ const MonitorForm = ({
                         <button
                             type="button"
                             onClick={() => {
-                                setIsCreateOpen(false);
-                                // resetCreateForm();
+                                onClose();
                             }}
                             className="inline-flex items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             disabled={pending}
@@ -184,7 +189,7 @@ const MonitorForm = ({
                             className="inline-flex items-center cursor-pointer justify-center rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                             disabled={pending}
                         >
-                            Create monitor
+                            {intent === MonitorActionIntent.CREATE ? 'Create monitor': "Update monitor"}
                         </button>
                     </div>
                 </form>

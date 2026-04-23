@@ -56,6 +56,30 @@ export const monitorAction = async (prev: MonitorState, formData: FormData) => {
                 success: true,
                 lastAction: intent
             };
+        } else if(intent === MonitorActionIntent.UPDATE) {
+            const monitorId = formData.get('id') as string;
+            const parsed = createMonitorSchema.safeParse(Object.fromEntries(formData));
+
+            if (!parsed.success) {
+                return {
+                    ...prev,
+                    error: parsed.error.message,
+                    success: false, 
+                    lastAction: intent
+                }
+            }
+
+            const updatedMonitor = await apiFetch(`/monitor/${monitorId}`, {
+                method: 'PATCH',
+                body: parsed.data as any
+            });
+
+            return {
+                ...prev,
+                monitors: prev.monitors.map(m => m.id === monitorId ? updatedMonitor : m),
+                success: true,
+                lastAction: intent
+            };
         }
 
         return prev;
