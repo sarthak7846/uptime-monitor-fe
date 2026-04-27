@@ -11,7 +11,7 @@ const MonitorClient = ({ initialMonitorState }: {
     initialMonitorState: MonitorState
 }) => {
     const [state, action, pending] = useActionState(monitorAction, initialMonitorState);
-    const [modal, setModal] = useState<ModalState>({mode: 'closed'})
+    const [modal, setModal] = useState<ModalState>({ mode: 'closed' })
 
     useEffect(() => {
         if (state.success) {
@@ -24,9 +24,9 @@ const MonitorClient = ({ initialMonitorState }: {
         }
     }, [state.success, state.lastAction]);
 
-    const openCreate = () => setModal({mode: 'create'});
-    const openEdit = (monitor: Monitor) => setModal({mode: 'edit', monitor});
-    const closeModal = () => setModal({mode: 'closed'});
+    const openCreate = () => setModal({ mode: 'create' });
+    const openEdit = (monitor: Monitor) => setModal({ mode: 'edit', monitor });
+    const closeModal = () => setModal({ mode: 'closed' });
 
     return (
         <div className="space-y-6">
@@ -43,18 +43,18 @@ const MonitorClient = ({ initialMonitorState }: {
                     name="intent"
                     value="create"
                     onClick={() => openCreate()}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                     <span className="text-base leading-none">+</span>
                     <span>New monitor</span>
                 </button>
             </div>
 
-            <MonitorList action={action} openEdit={openEdit} state={state}/>
+            <MonitorList action={action} openEdit={openEdit} state={state} />
             {state.error && <div className="text-red-500">{JSON.stringify(state.error)}</div>}
 
-{modal.mode !== 'closed' && (
-                <MonitorForm action={action} pending={pending} intent={modal.mode === 'edit' ? MonitorActionIntent.UPDATE: MonitorActionIntent.CREATE} monitor={modal.mode === 'edit' ? modal.monitor : undefined} onClose={closeModal}/>
+            {modal.mode !== 'closed' && (
+                <MonitorForm action={action} pending={pending} intent={modal.mode === 'edit' ? MonitorActionIntent.UPDATE : MonitorActionIntent.CREATE} monitor={modal.mode === 'edit' ? modal.monitor : undefined} onClose={closeModal} />
             )}
         </div>
     );

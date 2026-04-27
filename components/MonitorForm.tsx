@@ -47,7 +47,7 @@ const MonitorForm = ({
                         onClick={() => {
                             onClose();
                         }}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        className="inline-flex cursor-pointer h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         aria-label="Close"
                     >
                         ×
@@ -115,7 +115,7 @@ const MonitorForm = ({
                             </select>
                         </div>
 
-                        <div className="space-y-1.5">
+                        {/* <div className="space-y-1.5">
                             <label
                                 htmlFor="lastStatus"
                                 className="text-xs font-medium leading-none text-foreground"
@@ -136,7 +136,7 @@ const MonitorForm = ({
                             <p className="text-[11px] text-muted-foreground">
                                 Optional. Reflects the last known state.
                             </p>
-                        </div>
+                        </div> */}
 
                         <div className="space-y-1.5">
                             <label
@@ -179,7 +179,7 @@ const MonitorForm = ({
                             onClick={() => {
                                 onClose();
                             }}
-                            className="inline-flex items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             disabled={pending}
                         >
                             Cancel
