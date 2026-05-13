@@ -14,6 +14,9 @@ export async function signInAction(_: any, formData: FormData) {
       {
         email,
         password,
+      },
+      {
+        withCredentials: true
       }
     );
 
