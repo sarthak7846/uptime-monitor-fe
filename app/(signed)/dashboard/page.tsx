@@ -1,7 +1,7 @@
-const Dashboard = () => {
-  return (
-    <div>Dashboard</div>
-  )
-}
+import DashboardClient from "./DashboardClient";
 
-export default Dashboard
+const DashboardPage = () => {
+  return <DashboardClient />;
+};
+
+export default DashboardPage;

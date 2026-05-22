@@ -1,0 +1,392 @@
+"use client";
+
+import Link from "next/link";
+import { IncidentStatus } from "@/app/(signed)/incident/types";
+import { MonitorStatus } from "@/app/(signed)/monitor/types";
+import ChannelBadge from "@/components/ChannelBadge";
+import {
+  dashboardIncidents,
+  dashboardMonitors,
+  dashboardNotifications,
+} from "./mock-data";
+
+const monitorStatusStyles: Record<MonitorStatus, string> = {
+  UP: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
+  DOWN: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",
+  PENDING:
+    "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+};
+
+const incidentStatusStyles: Record<IncidentStatus, string> = {
+  [IncidentStatus.OPEN]:
+    "border-amber-200/80 bg-amber-50 text-amber-800 ring-amber-500/20 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/25",
+  [IncidentStatus.RESOLVED]:
+    "border-emerald-200/80 bg-emerald-50 text-emerald-800 ring-emerald-500/20 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/25",
+};
+
+const formatDate = (value: string | null) => {
+  if (!value) return "—";
+  return new Date(value).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+};
+
+const resolveMonitorName = (monitorId: string) => {
+  const m = dashboardMonitors.find((x) => x.id === monitorId);
+  return m?.name ?? monitorId;
+};
+
+const StatCard = ({
+  label,
+  value,
+  hint,
+  href,
+  accent,
+}: {
+  label: string;
+  value: string | number;
+  hint?: string;
+  href: string;
+  accent?: "default" | "warning" | "success" | "danger";
+}) => {
+  const accentBorder = {
+    default: "border-border",
+    warning: "border-amber-300/60 dark:border-amber-500/40",
+    success: "border-emerald-300/60 dark:border-emerald-500/40",
+    danger: "border-red-300/60 dark:border-red-500/40",
+  }[accent ?? "default"];
+
+  return (
+    <Link
+      href={href}
+      className={`group block rounded-xl border bg-card p-4 shadow-sm transition-colors hover:bg-muted/40 ${accentBorder}`}
+    >
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+        {value}
+      </p>
+      {hint && (
+        <p className="mt-1 text-xs text-muted-foreground group-hover:text-foreground/80">
+          {hint} →
+        </p>
+      )}
+    </Link>
+  );
+};
+
+const DashboardClient = () => {
+  const monitors = dashboardMonitors;
+  const incidents = dashboardIncidents;
+  const { endpoints } = dashboardNotifications;
+
+  const statusCounts = monitors.reduce(
+    (acc, m) => {
+      acc[m.lastStatus] = (acc[m.lastStatus] ?? 0) + 1;
+      return acc;
+    },
+    {} as Record<MonitorStatus, number>
+  );
+
+  const openIncidents = incidents.filter(
+    (i) => i.status === IncidentStatus.OPEN
+  );
+  const enabledRules = endpoints.flatMap((e) =>
+    e.rules.filter((r) => r.enabled)
+  );
+  const emailEndpoints = endpoints.filter((e) => e.channel === "EMAIL").length;
+  const downMonitors = monitors.filter((m) => m.lastStatus === "DOWN");
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          Dashboard
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Overview of monitor health, incidents, and alert configuration.
+        </p>
+      </div>
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Monitors"
+          value={monitors.length}
+          hint="View all monitors"
+          href="/monitor"
+          accent={
+            (statusCounts.DOWN ?? 0) > 0
+              ? "danger"
+              : (statusCounts.UP ?? 0) === monitors.length
+                ? "success"
+                : "default"
+          }
+        />
+        <StatCard
+          label="Open incidents"
+          value={openIncidents.length}
+          hint="View incidents"
+          href="/incident"
+          accent={openIncidents.length > 0 ? "warning" : "success"}
+        />
+        <StatCard
+          label="Endpoints"
+          value={endpoints.length}
+          hint="Notification settings"
+          href="/notifications"
+        />
+        <StatCard
+          label="Active rules"
+          value={enabledRules.length}
+          hint="Manage rules"
+          href="/notifications"
+        />
+      </section>
+
+      {downMonitors.length > 0 && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200/80 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200"
+        >
+          <span className="font-medium">
+            {downMonitors.length} monitor
+            {downMonitors.length > 1 ? "s are" : " is"} down
+          </span>
+          : {downMonitors.map((m) => m.name).join(", ")}. Check{" "}
+          <Link href="/incident" className="font-medium underline underline-offset-2">
+            incidents
+          </Link>{" "}
+          and{" "}
+          <Link
+            href="/notifications"
+            className="font-medium underline underline-offset-2"
+          >
+            notifications
+          </Link>{" "}
+          if you expect alerts.
+        </div>
+      )}
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <section className="space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-foreground">
+              Monitor health
+            </h2>
+            <Link
+              href="/monitor"
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {(["UP", "DOWN", "PENDING"] as MonitorStatus[]).map((status) => (
+              <span
+                key={status}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${monitorStatusStyles[status]}`}
+              >
+                {status}
+                <span className="opacity-80">· {statusCounts[status] ?? 0}</span>
+              </span>
+            ))}
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <table className="min-w-full divide-y divide-border text-sm">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Monitor
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {monitors.map((monitor) => (
+                  <tr key={monitor.id} className="hover:bg-muted/40">
+                    <td className="px-4 py-2.5">
+                      <span className="font-medium text-foreground">
+                        {monitor.name}
+                      </span>
+                      <p className="truncate text-xs text-muted-foreground max-w-[200px] sm:max-w-none">
+                        {monitor.url}
+                      </p>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${monitorStatusStyles[monitor.lastStatus]}`}
+                      >
+                        {monitor.lastStatus}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-foreground">
+              Recent incidents
+            </h2>
+            <Link
+              href="/incident"
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-border bg-card">
+            <table className="min-w-full divide-y divide-border text-sm">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Monitor
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Started
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {incidents.slice(0, 4).map((incident) => (
+                  <tr key={incident.id} className="hover:bg-muted/40">
+                    <td className="px-4 py-2.5 font-medium text-foreground">
+                      {resolveMonitorName(incident.monitorId)}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold uppercase ring-1 ring-inset ${incidentStatusStyles[incident.status]}`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${incident.status === IncidentStatus.OPEN ? "bg-amber-500" : "bg-emerald-500"}`}
+                          aria-hidden
+                        />
+                        {incident.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground">
+                      {formatDate(incident.startedAt)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {incidents.length === 0 && (
+              <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+                No incidents recorded.
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-foreground">
+            Notification coverage
+          </h2>
+          <Link
+            href="/notifications"
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            Manage notifications
+          </Link>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-border bg-card p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Email endpoints
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-foreground">
+              {emailEndpoints}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Delivered when monitors change state
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Enabled rules
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-foreground">
+              {enabledRules.length}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Across {endpoints.length} endpoint
+              {endpoints.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Monitors without rules
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-foreground">
+              {Math.max(
+                0,
+                monitors.length -
+                  new Set(
+                    enabledRules
+                      .map((r) => r.monitorId)
+                      .filter((id): id is string => id != null)
+                  ).size
+              )}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              May only receive global (all monitors) alerts
+            </p>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <ul className="divide-y divide-border">
+            {endpoints.map((endpoint) => (
+              <li
+                key={endpoint.id}
+                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5"
+              >
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <ChannelBadge channel={endpoint.channel} />
+                  <span className="truncate text-sm text-foreground">
+                    {endpoint.channel === "EMAIL"
+                      ? String(endpoint.config.email ?? "")
+                      : String(endpoint.config.webhookUrl ?? "").slice(0, 40)}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {endpoint.rules.length} rule
+                  {endpoint.rules.length !== 1 ? "s" : ""}
+                  {endpoint.rules.filter((r) => r.enabled).length > 0 &&
+                    ` · ${endpoint.rules.filter((r) => r.enabled).length} enabled`}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {endpoints.length === 0 && (
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+              No notification endpoints configured.{" "}
+              <Link href="/notifications" className="text-primary hover:underline">
+                Add one
+              </Link>
+            </p>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default DashboardClient;

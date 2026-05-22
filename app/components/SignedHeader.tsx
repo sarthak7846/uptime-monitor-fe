@@ -19,8 +19,8 @@ const SignedHeader = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b border-sidebar-border bg-background/95 px-6 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <Link
+    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-end border-b border-sidebar-border bg-background/95 px-6 backdrop-blur supports-backdrop-filter:bg-background/80">
+      {/* <Link
         href="/dashboard"
         className="flex items-center gap-2 font-semibold text-foreground transition-opacity hover:opacity-90"
       >
@@ -28,7 +28,7 @@ const SignedHeader = () => {
           U
         </span>
         <span className="hidden sm:inline">Uptime Monitor</span>
-      </Link>
+      </Link> */}
 
       <div className="relative" ref={menuRef}>
         <button

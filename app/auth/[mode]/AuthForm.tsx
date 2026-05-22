@@ -101,7 +101,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             >
               {isSignUp ? "Create account" : "Sign in"}
             </button>
-            <p className="text-red-500">{state?.message}</p>
+            <p className="text-red-500">{JSON.stringify(state?.message)}</p>
           </form>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">

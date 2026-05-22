@@ -1,7 +1,17 @@
-const Incident = () => {
+import { apiFetch } from "@/lib/api"
+import IncidentClient from "./IncidentClient";
+import { IncidentState } from "./types";
+
+const IncidentPage = async () => {
+  const res = await apiFetch('/incident/all');
+  const incidents = res;
+  const initialIncidentState: IncidentState = {
+    incidents,
+  };
+
   return (
-    <div>Incident</div>
+    <IncidentClient initialIncidentState={initialIncidentState} />
   )
 }
 
-export default Incident
+export default IncidentPage
