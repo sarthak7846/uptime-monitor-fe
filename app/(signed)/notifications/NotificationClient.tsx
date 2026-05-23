@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { initialNotificationUIState } from "./mock-data";
 import {
   EndpointModalState,
   NotificationEndpoint,
@@ -16,7 +15,7 @@ import RuleForm, { RuleFormValues } from "@/components/RuleForm";
 
 const newId = () => crypto.randomUUID();
 
-const NotificationClient = () => {
+const NotificationClient = ({initialNotificationUIState}: {initialNotificationUIState : NotificationUIState}) => {
   const [state, setState] = useState<NotificationUIState>(
     initialNotificationUIState
   );

@@ -6,6 +6,7 @@ import { monitorAction } from "./actions";
 import { toast } from "sonner";
 import MonitorForm from "@/components/MonitorForm";
 import MonitorList from "@/components/MonitorList";
+import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 
 const MonitorClient = ({ initialMonitorState }: {
     initialMonitorState: MonitorState
@@ -29,14 +30,9 @@ const MonitorClient = ({ initialMonitorState }: {
         setLiveMonitorState(actionState);
     }, [actionState])
 
-    useEffect(() => {
-        const sse = new EventSource(`${process.env.NEXT_PUBLIC_API_BASE_URL}/monitor/sse/events`, {
-            withCredentials: true
-        });
-
-        sse.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setLiveMonitorState((prev) => {
+    useRealtimeSubscription((data) => {
+        setLiveMonitorState((prev) => {
+            if (data.type === 'monitor.status') {
                 return {
                     ...prev,
                     monitors: prev.monitors.map((monitor) => {
@@ -46,18 +42,10 @@ const MonitorClient = ({ initialMonitorState }: {
                         } : monitor
                     })
                 }
-            })
-        };
-
-        sse.onerror = (err) => {
-            console.error('SSE error', err);
-        }
-
-        return () => {
-            console.log('disconnecting');
-            sse.close();
-        }
-    }, []);
+            }
+            return prev;
+        })
+    })
 
     const openCreate = () => setModal({ mode: 'create' });
     const openEdit = (monitor: Monitor) => setModal({ mode: 'edit', monitor });
