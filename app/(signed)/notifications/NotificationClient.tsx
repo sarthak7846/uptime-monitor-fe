@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import {
   EndpointModalState,
@@ -8,10 +8,12 @@ import {
   NotificationRule,
   NotificationUIState,
   RuleModalState,
+  RulesLoadState,
 } from "./types";
 import EndpointList from "@/components/EndpointList";
 import EndpointForm, { EndpointFormValues } from "@/components/EndpointForm";
 import RuleForm, { RuleFormValues } from "@/components/RuleForm";
+import axios from "axios";
 
 const newId = () => crypto.randomUUID();
 
@@ -21,10 +23,68 @@ const NotificationClient = ({
   initialNotificationUIState: NotificationUIState;
 }) => {
   const [state, setState] = useState<NotificationUIState>(initialNotificationUIState);
+  const [expandedEndpointId, setExpandedEndpointId] = useState<string | null>(null);
+  const [rulesLoadState, setRulesLoadState] = useState<Record<string, RulesLoadState>>({});
   const [endpointModal, setEndpointModal] = useState<EndpointModalState>({
     mode: "closed",
   });
   const [ruleModal, setRuleModal] = useState<RuleModalState>({ mode: "closed" });
+
+  const loadRules = useCallback(async (endpointId: string) => {
+    let skip = false;
+    setRulesLoadState((prev) => {
+      const current = prev[endpointId];
+      if (current?.status === "loading" || current?.status === "loaded") {
+        skip = true;
+        return prev;
+      }
+      return { ...prev, [endpointId]: { status: "loading" } };
+    });
+
+    if (skip) {
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/notification/rules/${endpointId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setRulesLoadState((prev) => ({
+        ...prev,
+        [endpointId]: { status: "loaded", rules: res.data },
+      }));
+    } catch {
+      setRulesLoadState((prev) => ({
+        ...prev,
+        [endpointId]: { status: "error", message: "Could not load rules. Try again." },
+      }));
+    }
+  }, []);
+
+  const handleToggleEndpoint = useCallback(
+    (endpointId: string) => {
+      if (expandedEndpointId === endpointId) {
+        setExpandedEndpointId(null);
+        return;
+      }
+
+      setExpandedEndpointId(endpointId);
+      void loadRules(endpointId);
+    },
+    [expandedEndpointId, loadRules]
+  );
+
+  const handleRetryLoadRules = useCallback(
+    (endpointId: string) => {
+      setRulesLoadState((prev) => ({ ...prev, [endpointId]: { status: "idle" } }));
+      void loadRules(endpointId);
+    },
+    [loadRules]
+  );
 
   const handleSaveEndpoint = (values: EndpointFormValues) => {
     const config =
@@ -35,7 +95,7 @@ const NotificationClient = ({
       channel: values.channel,
       config: config as Record<string, unknown>,
       createdAt: new Date().toISOString(),
-      rules: [],
+      ruleCount: 0,
     };
 
     setState((prev) => ({
@@ -58,9 +118,24 @@ const NotificationClient = ({
     setState((prev) => ({
       ...prev,
       endpoints: prev.endpoints.map((ep) =>
-        ep.id === values.endpointId ? { ...ep, rules: [...ep.rules, rule] } : ep
+        ep.id === values.endpointId ? { ...ep, ruleCount: ep.ruleCount + 1 } : ep
       ),
     }));
+
+    setRulesLoadState((prev) => {
+      const current = prev[values.endpointId];
+      if (current?.status !== "loaded") {
+        return prev;
+      }
+      return {
+        ...prev,
+        [values.endpointId]: {
+          status: "loaded",
+          rules: [...current.rules, rule],
+        },
+      };
+    });
+
     toast.success("Rule added (UI preview)");
   };
 
@@ -100,6 +175,10 @@ const NotificationClient = ({
           future use. Settings cannot be edited in-app until update/delete APIs exist.
         </p>
         <p className="mt-2 text-xs">
+          Click an endpoint to load its rules. Rules are fetched on demand to keep the initial page
+          load light.
+        </p>
+        <p className="mt-2 text-xs">
           Incidents on the{" "}
           <a
             href="/incident"
@@ -119,7 +198,15 @@ const NotificationClient = ({
 
       <EndpointList
         state={state}
-        onAddRule={(endpointId) => setRuleModal({ mode: "create", endpointId })}
+        expandedEndpointId={expandedEndpointId}
+        rulesLoadState={rulesLoadState}
+        onToggleEndpoint={handleToggleEndpoint}
+        onRetryLoadRules={handleRetryLoadRules}
+        onAddRule={(endpointId) => {
+          setExpandedEndpointId(endpointId);
+          void loadRules(endpointId);
+          setRuleModal({ mode: "create", endpointId });
+        }}
       />
 
       {endpointModal.mode === "create" && (

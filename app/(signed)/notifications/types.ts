@@ -16,7 +16,9 @@ export interface NotificationEndpoint {
   channel: NotificationChannel;
   config: Record<string, unknown>;
   createdAt: string;
-  rules: NotificationRule[];
+  ruleCount: number;
+  /** Present when fully loaded (e.g. dashboard). Omitted on the notifications list. */
+  rules?: NotificationRule[];
 }
 
 export interface MonitorOption {
@@ -29,6 +31,12 @@ export interface NotificationUIState {
   endpoints: NotificationEndpoint[];
   monitors: MonitorOption[];
 }
+
+export type RulesLoadState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "loaded"; rules: NotificationRule[] }
+  | { status: "error"; message: string };
 
 export type EndpointModalState = { mode: "closed" } | { mode: "create" };
 

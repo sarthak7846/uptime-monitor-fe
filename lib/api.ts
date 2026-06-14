@@ -4,7 +4,7 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const apiFetch = async (path: string, requestInit?: RequestInit) => {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  // const token = cookieStore.get("token")?.value;
 
   const isJsonBody = requestInit?.body && typeof requestInit.body === "object";
 

@@ -84,7 +84,7 @@ const DashboardClient = ({ initialDashboardState }: { initialDashboardState: Das
   );
 
   const openIncidents = incidents.filter((i) => i.status === IncidentStatus.OPEN);
-  const enabledRules = endpoints.flatMap((e) => e.rules.filter((r) => r.enabled));
+  const enabledRules = endpoints.flatMap((e) => (e.rules ?? []).filter((r) => r.enabled));
   const emailEndpoints = endpoints.filter((e) => e.channel === "EMAIL").length;
   const downMonitors = monitors.filter((m) => m.lastStatus === "DOWN");
 
@@ -328,10 +328,10 @@ const DashboardClient = ({ initialDashboardState }: { initialDashboardState: Das
                   </span>
                 </div>
                 <span className="text-muted-foreground text-xs">
-                  {endpoint.rules.length} rule
-                  {endpoint.rules.length !== 1 ? "s" : ""}
-                  {endpoint.rules.filter((r) => r.enabled).length > 0 &&
-                    ` · ${endpoint.rules.filter((r) => r.enabled).length} enabled`}
+                  {(endpoint.rules ?? []).length} rule
+                  {(endpoint.rules ?? []).length !== 1 ? "s" : ""}
+                  {(endpoint.rules ?? []).filter((r) => r.enabled).length > 0 &&
+                    ` · ${(endpoint.rules ?? []).filter((r) => r.enabled).length} enabled`}
                 </span>
               </li>
             ))}
