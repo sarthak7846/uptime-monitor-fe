@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  MonitorOption,
-  NotificationEventName,
-} from "@/app/(signed)/notifications/types";
+import { MonitorOption, NotificationEventName } from "@/app/(signed)/notifications/types";
 
 export type RuleFormValues = {
   endpointId: string;
@@ -24,16 +21,11 @@ const RuleForm = ({
   onClose: () => void;
   onSave: (values: RuleFormValues) => void;
 }) => {
-  const [events, setEvents] = useState<NotificationEventName[]>([
-    "monitor.down",
-    "monitor.up",
-  ]);
+  const [events, setEvents] = useState<NotificationEventName[]>(["monitor.down", "monitor.up"]);
 
   const toggleEvent = (event: NotificationEventName) => {
     setEvents((prev) =>
-      prev.includes(event)
-        ? prev.filter((e) => e !== event)
-        : [...prev, event]
+      prev.includes(event) ? prev.filter((e) => e !== event) : [...prev, event]
     );
   };
 
@@ -60,24 +52,24 @@ const RuleForm = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="rule-form-title"
-        className="relative z-40 w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-lg"
+        className="border-border bg-card relative z-40 w-full max-w-lg rounded-2xl border p-6 shadow-lg"
       >
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2
               id="rule-form-title"
-              className="text-base font-semibold tracking-tight text-foreground"
+              className="text-foreground text-base font-semibold tracking-tight"
             >
               Add notification rule
             </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-xs">
               Choose when alerts fire for this endpoint.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="text-muted-foreground hover:bg-muted focus-visible:ring-ring inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full focus-visible:ring-2 focus-visible:outline-none"
             aria-label="Close"
           >
             ×
@@ -86,17 +78,14 @@ const RuleForm = ({
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1.5">
-            <label
-              htmlFor="monitorId"
-              className="text-xs font-medium text-foreground"
-            >
+            <label htmlFor="monitorId" className="text-foreground text-xs font-medium">
               Monitor scope
             </label>
             <select
               id="monitorId"
               name="monitorId"
               defaultValue=""
-              className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="border-input bg-background focus-visible:ring-ring flex h-9 w-full rounded-lg border px-3 py-1.5 text-sm focus-visible:ring-2 focus-visible:outline-none"
             >
               <option value="">All monitors</option>
               {monitors.map((m) => (
@@ -106,23 +95,20 @@ const RuleForm = ({
               ))}
             </select>
             {monitors.length === 0 && (
-              <p className="text-[11px] text-muted-foreground">
-                No monitors yet. Scope will apply to all monitors when you add
-                them.
+              <p className="text-muted-foreground text-[11px]">
+                No monitors yet. Scope will apply to all monitors when you add them.
               </p>
             )}
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="text-xs font-medium text-foreground">
-              Events
-            </legend>
+            <legend className="text-foreground text-xs font-medium">Events</legend>
             <label className="flex cursor-pointer items-center gap-2 text-sm">
               <input
                 type="checkbox"
                 checked={events.includes("monitor.down")}
                 onChange={() => toggleEvent("monitor.down")}
-                className="h-4 w-4 rounded border-input"
+                className="border-input h-4 w-4 rounded"
               />
               Monitor went down
             </label>
@@ -131,14 +117,12 @@ const RuleForm = ({
                 type="checkbox"
                 checked={events.includes("monitor.up")}
                 onChange={() => toggleEvent("monitor.up")}
-                className="h-4 w-4 rounded border-input"
+                className="border-input h-4 w-4 rounded"
               />
               Monitor recovered
             </label>
             {events.length === 0 && (
-              <p className="text-[11px] text-destructive">
-                Select at least one event.
-              </p>
+              <p className="text-destructive text-[11px]">Select at least one event.</p>
             )}
           </fieldset>
 
@@ -147,7 +131,7 @@ const RuleForm = ({
               type="checkbox"
               name="enabled"
               defaultChecked
-              className="h-4 w-4 rounded border-input"
+              className="border-input h-4 w-4 rounded"
             />
             Rule enabled
           </label>
@@ -156,14 +140,14 @@ const RuleForm = ({
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-xs font-medium hover:bg-muted"
+              className="border-input bg-background hover:bg-muted inline-flex cursor-pointer items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={events.length === 0}
-              className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-60"
             >
               Add rule
             </button>

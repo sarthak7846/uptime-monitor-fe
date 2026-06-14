@@ -19,7 +19,7 @@ const SignedHeader = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-end border-b border-sidebar-border bg-background/95 px-6 backdrop-blur supports-backdrop-filter:bg-background/80">
+    <header className="border-sidebar-border bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-0 z-10 flex h-14 shrink-0 items-center justify-end border-b px-6 backdrop-blur">
       {/* <Link
         href="/dashboard"
         className="flex items-center gap-2 font-semibold text-foreground transition-opacity hover:opacity-90"
@@ -34,24 +34,22 @@ const SignedHeader = () => {
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="flex items-center gap-2 rounded-full outline-none ring-sidebar-ring focus-visible:ring-2"
+          className="ring-sidebar-ring flex items-center gap-2 rounded-full outline-none focus-visible:ring-2"
           aria-expanded={open}
           aria-haspopup="true"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground text-sm font-medium ring-1 ring-sidebar-border">
+          <span className="bg-sidebar-accent text-sidebar-accent-foreground ring-sidebar-border flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium ring-1">
             U
           </span>
-          <span className="hidden text-sm text-muted-foreground sm:inline">
-            Account
-          </span>
+          <span className="text-muted-foreground hidden text-sm sm:inline">Account</span>
         </button>
 
         {open && (
-          <div className="absolute right-0 top-full z-20 mt-2 w-48 origin-top-right rounded-xl border border-sidebar-border bg-popover py-1 shadow-lg animate-in fade-in-0 zoom-in-95">
+          <div className="border-sidebar-border bg-popover animate-in fade-in-0 zoom-in-95 absolute top-full right-0 z-20 mt-2 w-48 origin-top-right rounded-xl border py-1 shadow-lg">
             <form action={signOutAction}>
               <button
                 type="submit"
-                className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                className="text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
               >
                 Sign out
               </button>

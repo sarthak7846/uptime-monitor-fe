@@ -1,9 +1,6 @@
 import { NotificationChannel } from "@/app/(signed)/notifications/types";
 
-const channelStyles: Record<
-  NotificationChannel,
-  { badge: string; dot: string; label?: string }
-> = {
+const channelStyles: Record<NotificationChannel, { badge: string; dot: string; label?: string }> = {
   EMAIL: {
     badge:
       "border-emerald-200/80 bg-emerald-50 text-emerald-800 ring-emerald-500/20 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/25",
@@ -28,18 +25,11 @@ const ChannelBadge = ({ channel }: { channel: NotificationChannel }) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ring-1 ring-inset ${styles.badge}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold tracking-wide uppercase ring-1 ring-inset ${styles.badge}`}
     >
-      <span
-        className={`h-1.5 w-1.5 shrink-0 rounded-full ${styles.dot}`}
-        aria-hidden
-      />
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${styles.dot}`} aria-hidden />
       <span>{channel}</span>
-      {styles.label && (
-        <span className="normal-case font-normal opacity-80">
-          · {styles.label}
-        </span>
-      )}
+      {styles.label && <span className="font-normal normal-case opacity-80">· {styles.label}</span>}
     </span>
   );
 };

@@ -1,7 +1,4 @@
-import {
-  NotificationEndpoint,
-  NotificationUIState,
-} from "@/app/(signed)/notifications/types";
+import { NotificationEndpoint, NotificationUIState } from "@/app/(signed)/notifications/types";
 import { formatEvents } from "@/app/(signed)/notifications/labels";
 import ChannelBadge from "@/components/ChannelBadge";
 import EnabledBadge from "@/components/EnabledBadge";
@@ -40,13 +37,10 @@ const EndpointList = ({
 }) => {
   if (state.endpoints.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border bg-card px-6 py-14 text-center">
-        <p className="text-sm font-medium text-foreground">
-          No notification endpoints yet
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Add an endpoint to define where alerts are sent, then attach rules for
-          when to notify.
+      <div className="border-border bg-card rounded-xl border border-dashed px-6 py-14 text-center">
+        <p className="text-foreground text-sm font-medium">No notification endpoints yet</p>
+        <p className="text-muted-foreground mt-2 text-sm">
+          Add an endpoint to define where alerts are sent, then attach rules for when to notify.
         </p>
       </div>
     );
@@ -57,82 +51,81 @@ const EndpointList = ({
       {state.endpoints.map((endpoint) => (
         <article
           key={endpoint.id}
-          className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+          className="border-border bg-card overflow-hidden rounded-xl border shadow-sm"
         >
-          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border bg-muted/30 px-4 py-4 sm:px-5">
+          <div className="border-border bg-muted/30 flex flex-wrap items-start justify-between gap-4 border-b px-4 py-4 sm:px-5">
             <div className="min-w-0 flex-1 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <ChannelBadge channel={endpoint.channel} />
-                <span className="text-xs text-muted-foreground">
+                <span className="text-muted-foreground text-xs">
                   Added {formatDate(endpoint.createdAt)}
                 </span>
               </div>
-              <p className="truncate text-sm font-medium text-foreground">
+              <p className="text-foreground truncate text-sm font-medium">
                 {getDestination(endpoint)}
               </p>
             </div>
             <button
               type="button"
               onClick={() => onAddRule(endpoint.id)}
-              className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-lg border border-input bg-background px-3 py-1.5 text-xs font-medium text-foreground shadow-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="border-input bg-background text-foreground hover:bg-muted focus-visible:ring-ring inline-flex shrink-0 cursor-pointer items-center justify-center rounded-lg border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               Add rule
             </button>
           </div>
 
           <div className="px-4 py-3 sm:px-5">
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <h3 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
               Rules
             </h3>
             {endpoint.rules.length === 0 ? (
-              <p className="py-4 text-sm text-muted-foreground">
-                No rules for this endpoint. Add a rule to choose which events
-                trigger alerts.
+              <p className="text-muted-foreground py-4 text-sm">
+                No rules for this endpoint. Add a rule to choose which events trigger alerts.
               </p>
             ) : (
-              <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="min-w-full divide-y divide-border text-sm">
+              <div className="border-border overflow-x-auto rounded-lg border">
+                <table className="divide-border min-w-full divide-y text-sm">
                   <thead className="bg-muted/50">
                     <tr>
                       <th
                         scope="col"
-                        className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                        className="text-muted-foreground px-3 py-2.5 text-left text-xs font-medium tracking-wide uppercase"
                       >
                         Scope
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                        className="text-muted-foreground px-3 py-2.5 text-left text-xs font-medium tracking-wide uppercase"
                       >
                         Events
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                        className="text-muted-foreground px-3 py-2.5 text-left text-xs font-medium tracking-wide uppercase"
                       >
                         Status
                       </th>
                       <th
                         scope="col"
-                        className="px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground"
+                        className="text-muted-foreground px-3 py-2.5 text-left text-xs font-medium tracking-wide uppercase"
                       >
                         Created
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border bg-card">
+                  <tbody className="divide-border bg-card divide-y">
                     {endpoint.rules.map((rule) => (
                       <tr key={rule.id} className="hover:bg-muted/40">
-                        <td className="px-3 py-2.5 align-top font-medium text-foreground">
+                        <td className="text-foreground px-3 py-2.5 align-top font-medium">
                           {resolveMonitorLabel(rule.monitorId, state.monitors)}
                         </td>
-                        <td className="px-3 py-2.5 align-top text-muted-foreground">
+                        <td className="text-muted-foreground px-3 py-2.5 align-top">
                           {formatEvents(rule.events)}
                         </td>
                         <td className="px-3 py-2.5 align-top">
                           <EnabledBadge enabled={rule.enabled} />
                         </td>
-                        <td className="px-3 py-2.5 align-top text-xs text-muted-foreground">
+                        <td className="text-muted-foreground px-3 py-2.5 align-top text-xs">
                           {formatDate(rule.createdAt)}
                         </td>
                       </tr>

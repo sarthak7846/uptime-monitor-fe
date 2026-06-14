@@ -32,6 +32,4 @@ export interface NotificationUIState {
 
 export type EndpointModalState = { mode: "closed" } | { mode: "create" };
 
-export type RuleModalState =
-  | { mode: "closed" }
-  | { mode: "create"; endpointId: string };
+export type RuleModalState = { mode: "closed" } | { mode: "create"; endpointId: string };

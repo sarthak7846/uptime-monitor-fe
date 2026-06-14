@@ -16,23 +16,21 @@ export async function signInAction(_: any, formData: FormData) {
         password,
       },
       {
-        withCredentials: true
+        withCredentials: true,
       }
     );
 
     // console.log("data", data);
 
     const token = data.access_token;
-
+    const ufsdf = "un";
     const cookieStore = await cookies();
 
     cookieStore.set("token", token);
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     return {
-      message: error.response?.data?.message ?? {
-        message: "Something went wrong",
-      },
+      message: "Something went wrong",
     };
   }
 

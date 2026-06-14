@@ -4,17 +4,13 @@ import Link from "next/link";
 import { IncidentStatus } from "@/app/(signed)/incident/types";
 import { MonitorStatus } from "@/app/(signed)/monitor/types";
 import ChannelBadge from "@/components/ChannelBadge";
-import {
-  dashboardIncidents,
-  dashboardMonitors,
-  dashboardNotifications,
-} from "./mock-data";
+import { dashboardIncidents, dashboardMonitors, dashboardNotifications } from "./mock-data";
+import { DashboardState } from "./types";
 
 const monitorStatusStyles: Record<MonitorStatus, string> = {
   UP: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
   DOWN: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",
-  PENDING:
-    "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+  PENDING: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
 };
 
 const incidentStatusStyles: Record<IncidentStatus, string> = {
@@ -60,16 +56,12 @@ const StatCard = ({
   return (
     <Link
       href={href}
-      className={`group block rounded-xl border bg-card p-4 shadow-sm transition-colors hover:bg-muted/40 ${accentBorder}`}
+      className={`group bg-card hover:bg-muted/40 block rounded-xl border p-4 shadow-sm transition-colors ${accentBorder}`}
     >
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
-        {value}
-      </p>
+      <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{label}</p>
+      <p className="text-foreground mt-2 text-2xl font-semibold tracking-tight">{value}</p>
       {hint && (
-        <p className="mt-1 text-xs text-muted-foreground group-hover:text-foreground/80">
+        <p className="text-muted-foreground group-hover:text-foreground/80 mt-1 text-xs">
           {hint} →
         </p>
       )}
@@ -77,9 +69,10 @@ const StatCard = ({
   );
 };
 
-const DashboardClient = () => {
-  const monitors = dashboardMonitors;
-  const incidents = dashboardIncidents;
+const DashboardClient = ({ initialDashboardState }: { initialDashboardState: DashboardState }) => {
+  const { monitors, incidents } = initialDashboardState;
+  // const monitors = dashboardMonitors;
+  // const incidents = dashboardIncidents;
   const { endpoints } = dashboardNotifications;
 
   const statusCounts = monitors.reduce(
@@ -90,22 +83,16 @@ const DashboardClient = () => {
     {} as Record<MonitorStatus, number>
   );
 
-  const openIncidents = incidents.filter(
-    (i) => i.status === IncidentStatus.OPEN
-  );
-  const enabledRules = endpoints.flatMap((e) =>
-    e.rules.filter((r) => r.enabled)
-  );
+  const openIncidents = incidents.filter((i) => i.status === IncidentStatus.OPEN);
+  const enabledRules = endpoints.flatMap((e) => e.rules.filter((r) => r.enabled));
   const emailEndpoints = endpoints.filter((e) => e.channel === "EMAIL").length;
   const downMonitors = monitors.filter((m) => m.lastStatus === "DOWN");
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Dashboard
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-foreground text-xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
           Overview of monitor health, incidents, and alert configuration.
         </p>
       </div>
@@ -159,10 +146,7 @@ const DashboardClient = () => {
             incidents
           </Link>{" "}
           and{" "}
-          <Link
-            href="/notifications"
-            className="font-medium underline underline-offset-2"
-          >
+          <Link href="/notifications" className="font-medium underline underline-offset-2">
             notifications
           </Link>{" "}
           if you expect alerts.
@@ -172,13 +156,8 @@ const DashboardClient = () => {
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-foreground">
-              Monitor health
-            </h2>
-            <Link
-              href="/monitor"
-              className="text-xs font-medium text-primary hover:underline"
-            >
+            <h2 className="text-foreground text-sm font-semibold">Monitor health</h2>
+            <Link href="/monitor" className="text-primary text-xs font-medium hover:underline">
               View all
             </Link>
           </div>
@@ -195,26 +174,24 @@ const DashboardClient = () => {
             ))}
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <table className="min-w-full divide-y divide-border text-sm">
+          <div className="border-border bg-card overflow-hidden rounded-xl border">
+            <table className="divide-border min-w-full divide-y text-sm">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <th className="text-muted-foreground px-4 py-2.5 text-left text-xs font-medium tracking-wide uppercase">
                     Monitor
                   </th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <th className="text-muted-foreground px-4 py-2.5 text-left text-xs font-medium tracking-wide uppercase">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-border divide-y">
                 {monitors.map((monitor) => (
                   <tr key={monitor.id} className="hover:bg-muted/40">
                     <td className="px-4 py-2.5">
-                      <span className="font-medium text-foreground">
-                        {monitor.name}
-                      </span>
-                      <p className="truncate text-xs text-muted-foreground max-w-[200px] sm:max-w-none">
+                      <span className="text-foreground font-medium">{monitor.name}</span>
+                      <p className="text-muted-foreground max-w-[200px] truncate text-xs sm:max-w-none">
                         {monitor.url}
                       </p>
                     </td>
@@ -234,36 +211,31 @@ const DashboardClient = () => {
 
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-foreground">
-              Recent incidents
-            </h2>
-            <Link
-              href="/incident"
-              className="text-xs font-medium text-primary hover:underline"
-            >
+            <h2 className="text-foreground text-sm font-semibold">Recent incidents</h2>
+            <Link href="/incident" className="text-primary text-xs font-medium hover:underline">
               View all
             </Link>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <table className="min-w-full divide-y divide-border text-sm">
+          <div className="border-border bg-card overflow-hidden rounded-xl border">
+            <table className="divide-border min-w-full divide-y text-sm">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <th className="text-muted-foreground px-4 py-2.5 text-left text-xs font-medium tracking-wide uppercase">
                     Monitor
                   </th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <th className="text-muted-foreground px-4 py-2.5 text-left text-xs font-medium tracking-wide uppercase">
                     Status
                   </th>
-                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <th className="text-muted-foreground px-4 py-2.5 text-left text-xs font-medium tracking-wide uppercase">
                     Started
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-border divide-y">
                 {incidents.slice(0, 4).map((incident) => (
                   <tr key={incident.id} className="hover:bg-muted/40">
-                    <td className="px-4 py-2.5 font-medium text-foreground">
+                    <td className="text-foreground px-4 py-2.5 font-medium">
                       {resolveMonitorName(incident.monitorId)}
                     </td>
                     <td className="px-4 py-2.5">
@@ -277,7 +249,7 @@ const DashboardClient = () => {
                         {incident.status}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground">
+                    <td className="text-muted-foreground px-4 py-2.5 text-xs">
                       {formatDate(incident.startedAt)}
                     </td>
                   </tr>
@@ -285,7 +257,7 @@ const DashboardClient = () => {
               </tbody>
             </table>
             {incidents.length === 0 && (
-              <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+              <p className="text-muted-foreground px-4 py-8 text-center text-sm">
                 No incidents recorded.
               </p>
             )}
@@ -295,64 +267,53 @@ const DashboardClient = () => {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-foreground">
-            Notification coverage
-          </h2>
-          <Link
-            href="/notifications"
-            className="text-xs font-medium text-primary hover:underline"
-          >
+          <h2 className="text-foreground text-sm font-semibold">Notification coverage</h2>
+          <Link href="/notifications" className="text-primary text-xs font-medium hover:underline">
             Manage notifications
           </Link>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <div className="border-border bg-card rounded-xl border p-4">
+            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Email endpoints
             </p>
-            <p className="mt-2 text-2xl font-semibold text-foreground">
-              {emailEndpoints}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="text-foreground mt-2 text-2xl font-semibold">{emailEndpoints}</p>
+            <p className="text-muted-foreground mt-1 text-xs">
               Delivered when monitors change state
             </p>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <div className="border-border bg-card rounded-xl border p-4">
+            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Enabled rules
             </p>
-            <p className="mt-2 text-2xl font-semibold text-foreground">
-              {enabledRules.length}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="text-foreground mt-2 text-2xl font-semibold">{enabledRules.length}</p>
+            <p className="text-muted-foreground mt-1 text-xs">
               Across {endpoints.length} endpoint
               {endpoints.length !== 1 ? "s" : ""}
             </p>
           </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <div className="border-border bg-card rounded-xl border p-4">
+            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Monitors without rules
             </p>
-            <p className="mt-2 text-2xl font-semibold text-foreground">
+            <p className="text-foreground mt-2 text-2xl font-semibold">
               {Math.max(
                 0,
                 monitors.length -
                   new Set(
-                    enabledRules
-                      .map((r) => r.monitorId)
-                      .filter((id): id is string => id != null)
+                    enabledRules.map((r) => r.monitorId).filter((id): id is string => id != null)
                   ).size
               )}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-xs">
               May only receive global (all monitors) alerts
             </p>
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
-          <ul className="divide-y divide-border">
+        <div className="border-border bg-card overflow-hidden rounded-xl border">
+          <ul className="divide-border divide-y">
             {endpoints.map((endpoint) => (
               <li
                 key={endpoint.id}
@@ -360,13 +321,13 @@ const DashboardClient = () => {
               >
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <ChannelBadge channel={endpoint.channel} />
-                  <span className="truncate text-sm text-foreground">
+                  <span className="text-foreground truncate text-sm">
                     {endpoint.channel === "EMAIL"
                       ? String(endpoint.config.email ?? "")
                       : String(endpoint.config.webhookUrl ?? "").slice(0, 40)}
                   </span>
                 </div>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-muted-foreground text-xs">
                   {endpoint.rules.length} rule
                   {endpoint.rules.length !== 1 ? "s" : ""}
                   {endpoint.rules.filter((r) => r.enabled).length > 0 &&
@@ -376,7 +337,7 @@ const DashboardClient = () => {
             ))}
           </ul>
           {endpoints.length === 0 && (
-            <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+            <p className="text-muted-foreground px-4 py-8 text-center text-sm">
               No notification endpoints configured.{" "}
               <Link href="/notifications" className="text-primary hover:underline">
                 Add one

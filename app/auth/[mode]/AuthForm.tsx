@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { signInAction } from "../actions";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 
 type AuthFormProps = {
   mode: "signin" | "signup";
@@ -10,31 +11,30 @@ type AuthFormProps = {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const isSignUp = mode === "signup";
-
   const [state, action, pending] = useActionState(signInAction, null);
 
+  useEffect(() => {
+    if (!state?.message) return;
+    toast.error(state?.message);
+  }, [state?.message]);
+
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-muted/30 px-4 py-12">
+    <div className="bg-muted/30 flex min-h-svh flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-[400px]">
-        <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+        <div className="border-border bg-card rounded-2xl border p-8 shadow-sm">
           <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-foreground text-2xl font-semibold tracking-tight">
               {isSignUp ? "Create an account" : "Welcome back"}
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {isSignUp
-                ? "Enter your details to get started."
-                : "Sign in to your uptime monitor."}
+            <p className="text-muted-foreground mt-2 text-sm">
+              {isSignUp ? "Enter your details to get started." : "Sign in to your uptime monitor."}
             </p>
           </div>
 
           <form className="space-y-4" action={action}>
             {isSignUp && (
               <div className="space-y-2">
-                <label
-                  htmlFor="name"
-                  className="text-sm font-medium leading-none text-foreground"
-                >
+                <label htmlFor="name" className="text-foreground text-sm leading-none font-medium">
                   Name
                 </label>
                 <input
@@ -43,16 +43,13 @@ export function AuthForm({ mode }: AuthFormProps) {
                   type="text"
                   placeholder="Your name"
                   autoComplete="name"
-                  className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-lg border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="text-sm font-medium leading-none text-foreground"
-              >
+              <label htmlFor="email" className="text-foreground text-sm leading-none font-medium">
                 Email
               </label>
               <input
@@ -62,7 +59,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 placeholder="you@example.com"
                 autoComplete="email"
                 required
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-lg border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               />
             </div>
 
@@ -70,14 +67,14 @@ export function AuthForm({ mode }: AuthFormProps) {
               <div className="flex items-center justify-between">
                 <label
                   htmlFor="password"
-                  className="text-sm font-medium leading-none text-foreground"
+                  className="text-foreground text-sm leading-none font-medium"
                 >
                   Password
                 </label>
                 {!isSignUp && (
                   <Link
                     href="/auth/forgot-password"
-                    className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground text-xs underline underline-offset-2"
                   >
                     Forgot password?
                   </Link>
@@ -90,27 +87,26 @@ export function AuthForm({ mode }: AuthFormProps) {
                 placeholder="••••••••"
                 autoComplete={isSignUp ? "new-password" : "current-password"}
                 required
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-lg border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               />
             </div>
 
             <button
               type="submit"
-              className="flex h-10 w-full disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring flex h-10 w-full cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-sm font-medium shadow transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-500"
               disabled={pending}
             >
               {isSignUp ? "Create account" : "Sign in"}
             </button>
-            <p className="text-red-500">{JSON.stringify(state?.message)}</p>
           </form>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-6 text-center text-sm">
             {isSignUp ? (
               <>
                 Already have an account?{" "}
                 <Link
                   href="/auth/signin"
-                  className="font-medium text-foreground underline underline-offset-2 hover:no-underline"
+                  className="text-foreground font-medium underline underline-offset-2 hover:no-underline"
                 >
                   Sign in
                 </Link>
@@ -120,7 +116,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 Don&apos;t have an account?{" "}
                 <Link
                   href="/auth/signup"
-                  className="font-medium text-foreground underline underline-offset-2 hover:no-underline"
+                  className="text-foreground font-medium underline underline-offset-2 hover:no-underline"
                 >
                   Sign up
                 </Link>
@@ -129,7 +125,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           </p>
         </div>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-6 text-center text-xs">
           Uptime Monitor — monitor your services in one place
         </p>
       </div>

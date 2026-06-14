@@ -4,12 +4,13 @@ import { NotificationUIState } from "./types";
 
 const NotificationsPage = async () => {
   const [endpoints, monitors] = await Promise.all([
-    apiFetch('/notification/endpoints'),
-    apiFetch('/monitor/all')
+    apiFetch("/notification/endpoints"),
+    apiFetch("/monitor/all"),
   ]);
 
   const initialNotificationUIState: NotificationUIState = {
-    endpoints, monitors
+    endpoints,
+    monitors,
   };
 
   return <NotificationClient initialNotificationUIState={initialNotificationUIState} />;

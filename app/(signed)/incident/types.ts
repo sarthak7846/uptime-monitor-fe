@@ -1,17 +1,17 @@
 export enum IncidentStatus {
-    OPEN = 'OPEN',
-    RESOLVED = 'RESOLVED',
+  OPEN = "OPEN",
+  RESOLVED = "RESOLVED",
 }
 
 export type Incident = {
-    id: string;
-    monitorId: string;
-    startedAt: string;
-    endedAt: string | null;
-    status: IncidentStatus;
-    triggerReason: string;
+  id: string;
+  monitorId: string;
+  startedAt: string;
+  endedAt: string | null;
+  status: IncidentStatus;
+  triggerReason: string;
 };
 
 export type IncidentState = {
-    incidents: Incident[];
+  incidents: Incident[];
 };

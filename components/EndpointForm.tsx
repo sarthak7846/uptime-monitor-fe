@@ -41,24 +41,22 @@ const EndpointForm = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="endpoint-form-title"
-        className="relative z-40 w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-lg"
+        className="border-border bg-card relative z-40 w-full max-w-lg rounded-2xl border p-6 shadow-lg"
       >
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2
               id="endpoint-form-title"
-              className="text-base font-semibold tracking-tight text-foreground"
+              className="text-foreground text-base font-semibold tracking-tight"
             >
               Add notification endpoint
             </h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Choose where alerts are delivered.
-            </p>
+            <p className="text-muted-foreground mt-1 text-xs">Choose where alerts are delivered.</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="text-muted-foreground hover:bg-muted focus-visible:ring-ring inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full focus-visible:ring-2 focus-visible:outline-none"
             aria-label="Close"
           >
             ×
@@ -67,20 +65,15 @@ const EndpointForm = ({
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1.5">
-            <label
-              htmlFor="channel"
-              className="text-xs font-medium text-foreground"
-            >
+            <label htmlFor="channel" className="text-foreground text-xs font-medium">
               Channel
             </label>
             <select
               id="channel"
               name="channel"
               value={channel}
-              onChange={(e) =>
-                setChannel(e.target.value as NotificationChannel)
-              }
-              className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onChange={(e) => setChannel(e.target.value as NotificationChannel)}
+              className="border-input bg-background focus-visible:ring-ring flex h-9 w-full rounded-lg border px-3 py-1.5 text-sm focus-visible:ring-2 focus-visible:outline-none"
             >
               <option value="EMAIL">EMAIL — delivered today</option>
               <option value="SLACK">SLACK — saved only</option>
@@ -95,10 +88,7 @@ const EndpointForm = ({
 
           {channel === "EMAIL" ? (
             <div className="space-y-1.5">
-              <label
-                htmlFor="email"
-                className="text-xs font-medium text-foreground"
-              >
+              <label htmlFor="email" className="text-foreground text-xs font-medium">
                 Email address
               </label>
               <input
@@ -107,15 +97,12 @@ const EndpointForm = ({
                 type="email"
                 required
                 placeholder="alerts@example.com"
-                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-lg border px-3 py-1.5 text-sm focus-visible:ring-2 focus-visible:outline-none"
               />
             </div>
           ) : (
             <div className="space-y-1.5">
-              <label
-                htmlFor="webhookUrl"
-                className="text-xs font-medium text-foreground"
-              >
+              <label htmlFor="webhookUrl" className="text-foreground text-xs font-medium">
                 Webhook URL
               </label>
               <input
@@ -124,7 +111,7 @@ const EndpointForm = ({
                 type="url"
                 required
                 placeholder="https://hooks.slack.com/services/..."
-                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-lg border px-3 py-1.5 text-sm focus-visible:ring-2 focus-visible:outline-none"
               />
             </div>
           )}
@@ -133,13 +120,13 @@ const EndpointForm = ({
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-input bg-background px-4 py-2 text-xs font-medium hover:bg-muted"
+              className="border-input bg-background hover:bg-muted inline-flex cursor-pointer items-center justify-center rounded-lg border px-4 py-2 text-xs font-medium"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-xs font-medium"
             >
               Add endpoint
             </button>

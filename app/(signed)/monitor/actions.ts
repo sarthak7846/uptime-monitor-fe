@@ -1,91 +1,92 @@
-'use server'
+"use server";
 
 import { apiFetch } from "@/lib/api";
 import { MonitorActionIntent, MonitorState } from "./types";
 import { createMonitorSchema } from "./schema";
 
 export const monitorAction = async (prev: MonitorState, formData: FormData) => {
-    const intent = formData.get('intent') as MonitorActionIntent;
-    console.log('monitor action', prev, formData, intent)
-    try {
-        if (intent === 'create') {
-            const parsed = createMonitorSchema.safeParse(Object.fromEntries(formData));
+  const intent = formData.get("intent") as MonitorActionIntent;
+  console.log("monitor action", prev, formData, intent);
+  try {
+    if (intent === "create") {
+      const parsed = createMonitorSchema.safeParse(Object.fromEntries(formData));
 
-            console.log('parsed', parsed);
+      console.log("parsed", parsed);
 
-            if (!parsed.success) {
-                return {
-                    ...prev,
-                    error: parsed.error.message,
-                    success: false, 
-                    lastAction: intent
-                }
-            }
+      if (!parsed.success) {
+        return {
+          ...prev,
+          error: parsed.error.message,
+          success: false,
+          lastAction: intent,
+        };
+      }
 
-            console.log('data', parsed)
+      console.log("data", parsed);
 
-            const res = await apiFetch('/monitor', {
-                method: 'POST',
-                body: parsed.data as any
-            });
+      const res = await apiFetch("/monitor", {
+        method: "POST",
+        body: parsed.data as any,
+      });
 
-            console.log('res', res)
+      console.log("res", res);
 
-            return {
-                ...prev,
-                monitors: [
-                    ...prev.monitors,
-                    res
-                ],
-                success: true,
-                lastAction: intent
-            };
-        } else if (intent === 'delete') {
-            console.log('formdata for deletion', formData)
-            const monitorId = formData.get('id') as string;
+      return {
+        ...prev,
+        monitors: [...prev.monitors, res],
+        success: true,
+        lastAction: intent,
+      };
+    } else if (intent === "delete") {
+      console.log("formdata for deletion", formData);
+      const monitorId = formData.get("id") as string;
 
-            console.log('monitorid', monitorId, typeof monitorId, typeof prev.monitors[0].id)
+      console.log("monitorid", monitorId, typeof monitorId, typeof prev.monitors[0].id);
 
-            await apiFetch(`/monitor/${monitorId}`, {
-                method: 'DELETE'
-            });
+      await apiFetch(`/monitor/${monitorId}`, {
+        method: "DELETE",
+      });
 
-            return {
-                ...prev,
-                monitors: prev.monitors.filter((monitor) => monitor.id !== monitorId),
-                success: true,
-                lastAction: intent
-            };
-        } else if(intent === MonitorActionIntent.UPDATE) {
-            const monitorId = formData.get('id') as string;
-            const parsed = createMonitorSchema.safeParse(Object.fromEntries(formData));
+      return {
+        ...prev,
+        monitors: prev.monitors.filter((monitor) => monitor.id !== monitorId),
+        success: true,
+        lastAction: intent,
+      };
+    } else if (intent === MonitorActionIntent.UPDATE) {
+      const monitorId = formData.get("id") as string;
+      const parsed = createMonitorSchema.safeParse(Object.fromEntries(formData));
 
-            if (!parsed.success) {
-                return {
-                    ...prev,
-                    error: parsed.error.message,
-                    success: false, 
-                    lastAction: intent
-                }
-            }
+      if (!parsed.success) {
+        return {
+          ...prev,
+          error: parsed.error.message,
+          success: false,
+          lastAction: intent,
+        };
+      }
 
-            const updatedMonitor = await apiFetch(`/monitor/${monitorId}`, {
-                method: 'PATCH',
-                body: parsed.data as any
-            });
+      const updatedMonitor = await apiFetch(`/monitor/${monitorId}`, {
+        method: "PATCH",
+        body: parsed.data as any,
+      });
 
-            return {
-                ...prev,
-                monitors: prev.monitors.map(m => m.id === monitorId ? updatedMonitor : m),
-                success: true,
-                lastAction: intent
-            };
-        }
-
-        return prev;
-
-    } catch (error: any) {
-        console.log('error', error)
-        return { ...prev, monitors: prev.monitors, error: error.response?.data?.message ?? error, success: false }
+      return {
+        ...prev,
+        monitors: prev.monitors.map((m) => (m.id === monitorId ? updatedMonitor : m)),
+        success: true,
+        lastAction: intent,
+      };
     }
+
+    return prev;
+  } catch (error: any) {
+    console.log("error", error);
+    return {
+      ...prev,
+      monitors: prev.monitors,
+      error: error.response?.data?.message ?? error,
+      success: false,
+    };
+  }
 };
