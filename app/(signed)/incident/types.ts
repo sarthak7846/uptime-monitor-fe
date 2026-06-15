@@ -10,6 +10,7 @@ export type Incident = {
   endedAt: string | null;
   status: IncidentStatus;
   triggerReason: string;
+  monitorName: string;
 };
 
 export type IncidentState = {

@@ -1,4 +1,4 @@
-import { Incident, IncidentState, IncidentStatus } from "@/app/(signed)/incident/types";
+import { IncidentState, IncidentStatus } from "@/app/(signed)/incident/types";
 
 const getStatusStyles = (status: IncidentStatus) => {
   switch (status) {
@@ -81,7 +81,7 @@ const IncidentList = ({ state }: { state: IncidentState }) => {
             <tr key={incident.id} className="hover:bg-muted/40">
               <td className="px-4 py-3 align-top">
                 <div className="flex flex-col">
-                  <span className="text-foreground font-medium">{incident.monitorId}</span>
+                  <span className="text-foreground font-medium">{incident.monitorName}</span>
                   <span className="text-muted-foreground text-xs">ID: {incident.id}</span>
                 </div>
               </td>

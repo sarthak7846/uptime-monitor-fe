@@ -151,14 +151,14 @@ const RulesPanel = ({
 
 const EndpointList = ({
   state,
-  expandedEndpointId,
+  expandedEndpointIds,
   rulesLoadState,
   onToggleEndpoint,
   onRetryLoadRules,
   onAddRule,
 }: {
   state: NotificationUIState;
-  expandedEndpointId: string | null;
+  expandedEndpointIds: string[];
   rulesLoadState: Record<string, RulesLoadState>;
   onToggleEndpoint: (endpointId: string) => void;
   onRetryLoadRules: (endpointId: string) => void;
@@ -178,7 +178,7 @@ const EndpointList = ({
   return (
     <div className="space-y-4">
       {state.endpoints.map((endpoint) => {
-        const isExpanded = expandedEndpointId === endpoint.id;
+        const isExpanded = expandedEndpointIds.includes(endpoint.id);
         const loadState = rulesLoadState[endpoint.id];
 
         return (

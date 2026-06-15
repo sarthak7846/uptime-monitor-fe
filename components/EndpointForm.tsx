@@ -75,15 +75,15 @@ const EndpointForm = ({
               onChange={(e) => setChannel(e.target.value as NotificationChannel)}
               className="border-input bg-background focus-visible:ring-ring flex h-9 w-full rounded-lg border px-3 py-1.5 text-sm focus-visible:ring-2 focus-visible:outline-none"
             >
-              <option value="EMAIL">EMAIL — delivered today</option>
-              <option value="SLACK">SLACK — saved only</option>
-              <option value="WEBHOOK">WEBHOOK — saved only</option>
+              <option value="EMAIL">EMAIL</option>
+              <option value="SLACK">SLACK</option>
+              {/* <option value="WEBHOOK">WEBHOOK</option> */}
             </select>
-            {channel !== "EMAIL" && (
+            {/* {channel !== "EMAIL" && (
               <p className="text-[11px] text-amber-700 dark:text-amber-400">
                 This channel is stored but not delivered yet by the backend.
               </p>
-            )}
+            )} */}
           </div>
 
           {channel === "EMAIL" ? (

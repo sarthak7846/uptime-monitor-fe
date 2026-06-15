@@ -23,7 +23,7 @@ const NotificationClient = ({
   initialNotificationUIState: NotificationUIState;
 }) => {
   const [state, setState] = useState<NotificationUIState>(initialNotificationUIState);
-  const [expandedEndpointId, setExpandedEndpointId] = useState<string | null>(null);
+  const [expandedEndpointIds, setExpandedEndpointIds] = useState<string[]>([]);
   const [rulesLoadState, setRulesLoadState] = useState<Record<string, RulesLoadState>>({});
   const [endpointModal, setEndpointModal] = useState<EndpointModalState>({
     mode: "closed",
@@ -67,15 +67,15 @@ const NotificationClient = ({
 
   const handleToggleEndpoint = useCallback(
     (endpointId: string) => {
-      if (expandedEndpointId === endpointId) {
-        setExpandedEndpointId(null);
-        return;
-      }
-
-      setExpandedEndpointId(endpointId);
-      void loadRules(endpointId);
+      setExpandedEndpointIds((prev) => {
+        if (expandedEndpointIds?.includes(endpointId)) {
+          return prev.filter((id) => id !== endpointId);
+        }
+        void loadRules(endpointId);
+        return [...prev, endpointId];
+      });
     },
-    [expandedEndpointId, loadRules]
+    [expandedEndpointIds, loadRules]
   );
 
   const handleRetryLoadRules = useCallback(
@@ -168,13 +168,13 @@ const NotificationClient = ({
         role="note"
         className="border-border bg-muted/40 text-muted-foreground rounded-xl border px-4 py-3 text-sm"
       >
-        <p>
+        {/* <p>
           <span className="text-foreground font-medium">EMAIL</span> alerts are sent when monitors
           change state. <span className="text-foreground font-medium">SLACK</span> and{" "}
           <span className="text-foreground font-medium">WEBHOOK</span> endpoints can be saved for
           future use. Settings cannot be edited in-app until update/delete APIs exist.
-        </p>
-        <p className="mt-2 text-xs">
+        </p> */}
+        <p className="text-xs">
           Click an endpoint to load its rules. Rules are fetched on demand to keep the initial page
           load light.
         </p>
@@ -198,12 +198,14 @@ const NotificationClient = ({
 
       <EndpointList
         state={state}
-        expandedEndpointId={expandedEndpointId}
+        expandedEndpointIds={expandedEndpointIds}
         rulesLoadState={rulesLoadState}
         onToggleEndpoint={handleToggleEndpoint}
         onRetryLoadRules={handleRetryLoadRules}
         onAddRule={(endpointId) => {
-          setExpandedEndpointId(endpointId);
+          setExpandedEndpointIds((prev) =>
+            prev.includes(endpointId) ? prev : [...prev, endpointId]
+          );
           void loadRules(endpointId);
           setRuleModal({ mode: "create", endpointId });
         }}

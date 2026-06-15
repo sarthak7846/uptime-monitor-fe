@@ -10,7 +10,6 @@ const channelStyles: Record<NotificationChannel, { badge: string; dot: string; l
     badge:
       "border-violet-200/80 bg-violet-50 text-violet-800 ring-violet-500/20 dark:border-violet-500/30 dark:bg-violet-500/15 dark:text-violet-300 dark:ring-violet-500/25",
     dot: "bg-violet-500",
-    label: "Coming soon",
   },
   WEBHOOK: {
     badge:
