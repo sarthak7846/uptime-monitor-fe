@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
 import { signOutAction } from "@/app/auth/actions";
 
@@ -34,7 +33,7 @@ const SignedHeader = () => {
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="ring-sidebar-ring flex items-center gap-2 rounded-full outline-none focus-visible:ring-2"
+          className="ring-sidebar-ring flex cursor-pointer items-center gap-2 rounded-full outline-none focus-visible:ring-2"
           aria-expanded={open}
           aria-haspopup="true"
         >
