@@ -1,4 +1,3 @@
-import { Incident, IncidentStatus } from "@/app/(signed)/incident/types";
 import { Monitor, MonitorStatus } from "@/app/(signed)/monitor/types";
 import { initialNotificationUIState } from "@/app/(signed)/notifications/mock-data";
 
@@ -54,33 +53,6 @@ export const dashboardMonitors: Monitor[] = [
     consecutiveSuccesses: 0,
     createdAt: new Date("2026-05-18"),
     userId: "user-1",
-  },
-];
-
-export const dashboardIncidents: Incident[] = [
-  {
-    id: "inc-1",
-    monitorId: "mon-2",
-    startedAt: "2026-05-22T09:12:00.000Z",
-    endedAt: null,
-    status: IncidentStatus.OPEN,
-    triggerReason: "HTTP 503 from health check",
-  },
-  {
-    id: "inc-2",
-    monitorId: "mon-1",
-    startedAt: "2026-05-21T16:40:00.000Z",
-    endedAt: "2026-05-21T17:05:00.000Z",
-    status: IncidentStatus.RESOLVED,
-    triggerReason: "Connection timeout",
-  },
-  {
-    id: "inc-3",
-    monitorId: "mon-2",
-    startedAt: "2026-05-19T11:00:00.000Z",
-    endedAt: "2026-05-19T11:45:00.000Z",
-    status: IncidentStatus.RESOLVED,
-    triggerReason: "HTTP 502 Bad Gateway",
   },
 ];
 

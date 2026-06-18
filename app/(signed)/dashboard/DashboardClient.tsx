@@ -4,7 +4,7 @@ import Link from "next/link";
 import { IncidentStatus } from "@/app/(signed)/incident/types";
 import { MonitorStatus } from "@/app/(signed)/monitor/types";
 import ChannelBadge from "@/components/ChannelBadge";
-import { dashboardIncidents, dashboardMonitors, dashboardNotifications } from "./mock-data";
+import { dashboardMonitors, dashboardNotifications } from "./mock-data";
 import { DashboardState } from "./types";
 
 const monitorStatusStyles: Record<MonitorStatus, string> = {
