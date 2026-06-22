@@ -81,11 +81,16 @@ const Sidebar = () => {
 
   return (
     <aside className="border-sidebar-border bg-sidebar text-sidebar-foreground fixed inset-y-0 left-0 z-20 flex w-56 flex-col border-r">
-      <div className="border-sidebar-border flex h-14 shrink-0 items-center gap-2 border-b px-4">
-        <span className="bg-sidebar-primary text-sidebar-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium">
-          U
-        </span>
-        <span className="font-semibold tracking-tight">Uptime Monitor</span>
+      <div className="border-sidebar-border flex h-14 shrink-0 items-center justify-center gap-2 border-b px-4">
+        <div className="flex items-center justify-between">
+          <span className="relative mr-3 flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+          </span>
+          <Link href="/" className="font-semibold tracking-tight">
+            Uptime Monitor
+          </Link>
+        </div>
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-auto p-3">

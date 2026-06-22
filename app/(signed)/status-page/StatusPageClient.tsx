@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { StatusPageState, StatusPageMonitor } from "./types";
 import { MonitorStatus } from "../monitor/types";
+import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 
 const getStatusStyles = (status: MonitorStatus) => {
   switch (status) {
@@ -62,12 +63,35 @@ const getOverallBadgeStyles = (status: MonitorStatus) => {
 };
 
 const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) => {
-  const [state] = useState(initialState);
+  const [state, setState] = useState(initialState);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
+
+  useRealtimeSubscription((data) => {
+    setState((prev) => {
+      if (data.type === "monitor.status") {
+        return {
+          ...prev,
+          statusPages: prev.statusPages.map((statusPage) => ({
+            ...statusPage,
+            monitors: statusPage.monitors.map((monitor) =>
+              monitor.id === data.monitorId
+                ? {
+                    ...monitor,
+                    lastStatus: data.status,
+                  }
+                : monitor
+            ),
+          })),
+        };
+      }
+
+      return prev;
+    });
+  });
 
   return (
     <div className="space-y-6">

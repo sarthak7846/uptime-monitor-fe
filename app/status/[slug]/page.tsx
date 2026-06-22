@@ -1,3 +1,4 @@
+import { RealtimeProvider } from "@/contexts/realtime";
 import PublicStatusPage from "./PublicStatusPage";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,7 @@ const StatusPage = async ({ params }: { params: Params }) => {
   const { slug } = await params;
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  let data = null;
+  let data;
   let error: string | null = null;
 
   try {
@@ -29,7 +30,11 @@ const StatusPage = async ({ params }: { params: Params }) => {
     error = "Unable to connect to the status service.";
   }
 
-  return <PublicStatusPage data={data} error={error} />;
+  return (
+    <RealtimeProvider>
+      <PublicStatusPage initialData={data} error={error} />;
+    </RealtimeProvider>
+  );
 };
 
 export default StatusPage;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { PublicStatusPageData, PublicMonitor, HistoryEntry } from "./types";
+import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
 
 /* ─── Status helpers ──────────────────────────────────────────────────────── */
 
@@ -12,19 +13,33 @@ const statusConfig = {
     badgeClass: "border-emerald-400/30 bg-emerald-400/10 text-emerald-400",
     headerGradient: "from-emerald-500/20 via-emerald-500/5 to-transparent",
   },
-  degraded: {
+  partial_outage: {
     label: "Degraded Performance",
     dotClass: "bg-amber-400",
     badgeClass: "border-amber-400/30 bg-amber-400/10 text-amber-400",
     headerGradient: "from-amber-500/20 via-amber-500/5 to-transparent",
   },
-  down: {
+  major_outage: {
     label: "Major Outage",
     dotClass: "bg-red-400",
     badgeClass: "border-red-400/30 bg-red-400/10 text-red-400",
     headerGradient: "from-red-500/20 via-red-500/5 to-transparent",
   },
 } as const;
+
+function calculateOverallStatus(monitors: PublicMonitor[]) {
+  const downCount = monitors.filter((monitor) => monitor.status === "DOWN").length;
+
+  if (downCount === 0) {
+    return "operational";
+  }
+
+  if (downCount === monitors.length) {
+    return "major_outage";
+  }
+
+  return "partial_outage";
+}
 
 const monitorStatusConfig = {
   UP: {
@@ -188,12 +203,39 @@ function MonitorCard({ monitor }: { monitor: PublicMonitor }) {
 /* ─── Main component ──────────────────────────────────────────────────────── */
 
 export default function PublicStatusPage({
-  data,
+  initialData,
   error,
 }: {
-  data: PublicStatusPageData | null;
+  initialData: PublicStatusPageData;
   error: string | null;
 }) {
+  const [data, setState] = useState(initialData);
+
+  console.log("PublicStatusPage rendered");
+
+  useRealtimeSubscription((data) => {
+    setState((prev) => {
+      if (data.type === "monitor.status") {
+        const monitors = prev.monitors.map((monitor) => {
+          return monitor.id === data.monitorId
+            ? {
+                ...monitor,
+                status: data.status,
+              }
+            : monitor;
+        });
+
+        return {
+          ...prev,
+          monitors,
+          overallStatus: calculateOverallStatus(monitors),
+        };
+      }
+
+      return prev;
+    });
+  });
+
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -219,8 +261,6 @@ export default function PublicStatusPage({
       </div>
     );
   }
-
-  if (!data) return null;
 
   const overall = statusConfig[data.overallStatus] || statusConfig.operational;
 

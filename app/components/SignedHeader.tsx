@@ -48,7 +48,7 @@ const SignedHeader = () => {
             <form action={signOutAction}>
               <button
                 type="submit"
-                className="text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
+                className="text-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex w-full cursor-pointer items-center gap-2 px-4 py-2 text-left text-sm transition-colors"
               >
                 Sign out
               </button>

@@ -25,5 +25,5 @@ export type PublicStatusPageData = {
   description: string | null;
   userId: string;
   monitors: PublicMonitor[];
-  overallStatus: "operational" | "degraded" | "down";
+  overallStatus: "operational" | "partial_outage" | "major_outage";
 };

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import {
   Activity,
   Bell,
@@ -37,7 +38,7 @@ const StatusDot = ({ status }: { status: "UP" | "DOWN" | "PENDING" }) => {
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 
-const Nav = () => (
+const Nav = ({ isAuthenticated }: { isAuthenticated: boolean }) => (
   <header className="border-border/50 animate-slide-down sticky top-0 z-50 border-b bg-[#0a0a0a]/80 backdrop-blur-md">
     <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
       <Link href="/" className="flex items-center gap-2.5">
@@ -57,28 +58,30 @@ const Nav = () => (
         </a>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Link
-          href="/auth/signin"
-          className="hidden text-sm text-neutral-400 transition-colors hover:text-white sm:block"
-        >
-          Sign in
-        </Link>
-        <Link
-          href="/auth/signup"
-          className="flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-all hover:bg-neutral-200 active:scale-95"
-        >
-          Get started
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-      </div>
+      {!isAuthenticated && (
+        <div className="flex items-center gap-3">
+          <Link
+            href="/auth/signin"
+            className="hidden text-sm text-neutral-400 transition-colors hover:text-white sm:block"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/auth/signup"
+            className="flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-all hover:bg-neutral-200 active:scale-95"
+          >
+            Get started
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
     </nav>
   </header>
 );
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
-const Hero = () => (
+const Hero = ({ isAuthenticated }: { isAuthenticated: boolean }) => (
   <section className="relative overflow-hidden" style={{ background: "#0a0a0a" }}>
     {/* Dot grid */}
     <div
@@ -146,19 +149,31 @@ const Hero = () => (
         className="animate-fade-up mt-10 flex flex-wrap items-center justify-center gap-4"
         style={{ animationDelay: "400ms" }}
       >
-        <Link
-          href="/auth/signup"
-          className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-white/10 transition-all hover:bg-neutral-100 hover:shadow-white/20 active:scale-95"
-        >
-          Start monitoring free
-          <ChevronRight className="h-4 w-4" />
-        </Link>
-        <Link
-          href="/auth/signin"
-          className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 active:scale-95"
-        >
-          Sign in to dashboard
-        </Link>
+        {isAuthenticated ? (
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-white/10 transition-all hover:bg-neutral-100 hover:shadow-white/20 active:scale-95"
+          >
+            Go to dashboard
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        ) : (
+          <>
+            <Link
+              href="/auth/signup"
+              className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-white/10 transition-all hover:bg-neutral-100 hover:shadow-white/20 active:scale-95"
+            >
+              Start monitoring free
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/auth/signin"
+              className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 active:scale-95"
+            >
+              Sign in to dashboard
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Hero mockup */}
@@ -782,12 +797,15 @@ const Footer = () => (
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const isAuthenticated = cookieStore.has("token");
+
   return (
     <>
-      <Nav />
+      <Nav isAuthenticated={isAuthenticated} />
       <main>
-        <Hero />
+        <Hero isAuthenticated={isAuthenticated} />
         <StatsStrip />
         <FeaturesSection />
         <HowItWorksSection />
