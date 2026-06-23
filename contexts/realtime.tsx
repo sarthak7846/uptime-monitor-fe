@@ -82,7 +82,7 @@ export const RealtimeProvider = ({ children }: { children: React.ReactNode }) =>
 
         signal: controller.signal,
 
-        onopen() {
+        onopen: async () => {
           setStatus("open");
         },
 
