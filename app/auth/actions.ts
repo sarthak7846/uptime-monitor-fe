@@ -9,7 +9,7 @@ export async function signInAction(_: any, formData: FormData) {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    const { data } = await axios.post(
+    const res = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
       {
         email,
@@ -19,14 +19,11 @@ export async function signInAction(_: any, formData: FormData) {
         withCredentials: true,
       }
     );
-
-    // console.log("data", data);
-
-    const token = data.access_token;
-    const ufsdf = "un";
-    const cookieStore = await cookies();
-
-    cookieStore.set("token", token);
+    const token = res.data.access_token;
+    if (token) {
+      const cookieStore = await cookies();
+      cookieStore.set("token", token);
+    }
   } catch (error: any) {
     console.log(error);
     return {
@@ -35,6 +32,10 @@ export async function signInAction(_: any, formData: FormData) {
   }
 
   redirect("/dashboard");
+}
+
+export async function getAccessToken() {
+  return (await cookies()).get("token")?.value || null;
 }
 
 export async function signOutAction() {
