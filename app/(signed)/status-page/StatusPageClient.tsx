@@ -1,9 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { StatusPageState, StatusPageMonitor } from "./types";
-import { MonitorStatus } from "../monitor/types";
+import { useActionState, useEffect, useState } from "react";
+import {
+  StatusPageState,
+  StatusPageMonitor,
+  StatusPage,
+  StatusPageModalState,
+  StatusPageActionIntent,
+} from "./types";
+import { Monitor, MonitorStatus } from "../monitor/types";
 import { useRealtimeSubscription } from "@/hooks/useRealtimeSubscription";
+import { statusPageAction } from "./actions";
+import { toast } from "sonner";
+import StatusPageForm from "@/components/StatusPageForm";
 
 const getStatusStyles = (status: MonitorStatus) => {
   switch (status) {
@@ -27,12 +36,12 @@ const getStatusDot = (status: MonitorStatus) => {
     case "PENDING":
       return "bg-amber-500";
     default:
-      return "bg-gray-500";
+      return "bg-white";
   }
 };
 
 const getOverallStatus = (monitors: StatusPageMonitor[]): MonitorStatus => {
-  if (monitors.length === 0) return "PENDING";
+  if (monitors.length === 0) return "EMPTY";
   if (monitors.some((m) => m.lastStatus === "DOWN")) return "DOWN";
   if (monitors.some((m) => m.lastStatus === "PENDING")) return "PENDING";
   return "UP";
@@ -46,6 +55,8 @@ const getOverallLabel = (status: MonitorStatus) => {
       return "Degraded Performance";
     case "PENDING":
       return "Checking...";
+    case "EMPTY":
+      return "No monitors attached";
   }
 };
 
@@ -62,16 +73,44 @@ const getOverallBadgeStyles = (status: MonitorStatus) => {
   }
 };
 
-const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) => {
-  const [state, setState] = useState(initialState);
+const StatusPageClient = ({
+  initialState,
+  monitors,
+}: {
+  initialState: StatusPageState;
+  monitors: Monitor[];
+}) => {
+  const [actionState, action, pending] = useActionState(statusPageAction, initialState);
+  const [modal, setModal] = useState<StatusPageModalState>({ mode: "closed" });
+  const [liveState, setLiveState] = useState(initialState);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
+  useEffect(() => {
+    if (actionState.success) {
+      if (
+        actionState.lastAction === StatusPageActionIntent.CREATE ||
+        actionState.lastAction === StatusPageActionIntent.UPDATE
+      ) {
+        closeModal();
+        toast.success(
+          `Status page ${actionState.lastAction === StatusPageActionIntent.CREATE ? "created" : "updated"} successfully`
+        );
+      } else if (actionState.lastAction === StatusPageActionIntent.DELETE) {
+        toast.success("Status page deleted");
+      }
+    }
+  }, [actionState.success, actionState.lastAction]);
+
+  useEffect(() => {
+    setLiveState(actionState);
+  }, [actionState]);
+
   useRealtimeSubscription((data) => {
-    setState((prev) => {
+    setLiveState((prev) => {
       if (data.type === "monitor.status") {
         return {
           ...prev,
@@ -93,6 +132,10 @@ const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) =
     });
   });
 
+  const openCreate = () => setModal({ mode: "create" });
+  const openEdit = (statusPage: StatusPage) => setModal({ mode: "edit", statusPage });
+  const closeModal = () => setModal({ mode: "closed" });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -106,6 +149,7 @@ const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) =
 
         <button
           type="button"
+          onClick={() => openCreate()}
           className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <span className="text-base leading-none">+</span>
@@ -115,7 +159,7 @@ const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) =
 
       {/* Status page cards */}
       <div className="space-y-3">
-        {state.statusPages.map((page) => {
+        {liveState.statusPages.map((page) => {
           const isExpanded = expandedId === page.id;
           const overall = getOverallStatus(page.monitors);
 
@@ -289,16 +333,21 @@ const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) =
                     </a>
                     <button
                       type="button"
+                      onClick={() => openEdit(page)}
                       className="border-border bg-background text-foreground hover:bg-muted focus-visible:ring-ring inline-flex cursor-pointer items-center justify-center rounded-md border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                     >
                       Edit
                     </button>
-                    <button
-                      type="button"
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    >
-                      Delete
-                    </button>
+                    <form action={action}>
+                      <input type="hidden" name="intent" value="delete" />
+                      <input type="hidden" name="id" value={page.id} />
+                      <button
+                        type="submit"
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                      >
+                        Delete
+                      </button>
+                    </form>
                   </div>
                 </div>
               )}
@@ -308,7 +357,7 @@ const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) =
       </div>
 
       {/* Empty state */}
-      {state.statusPages.length === 0 && (
+      {liveState.statusPages.length === 0 && (
         <div className="border-border bg-card rounded-xl border">
           <div className="text-muted-foreground px-6 py-14 text-center text-sm">
             <svg
@@ -332,7 +381,23 @@ const StatusPageClient = ({ initialState }: { initialState: StatusPageState }) =
         </div>
       )}
 
-      {state.error && <div className="text-sm text-red-500">{JSON.stringify(state.error)}</div>}
+      {actionState.error && (
+        <div className="text-sm text-red-500">{JSON.stringify(actionState.error)}</div>
+      )}
+
+      {/* Create/Edit modal */}
+      {modal.mode !== "closed" && (
+        <StatusPageForm
+          action={action}
+          pending={pending}
+          intent={
+            modal.mode === "edit" ? StatusPageActionIntent.UPDATE : StatusPageActionIntent.CREATE
+          }
+          statusPage={modal.mode === "edit" ? modal.statusPage : undefined}
+          monitors={monitors}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 };

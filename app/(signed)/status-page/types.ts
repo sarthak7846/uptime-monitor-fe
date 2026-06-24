@@ -27,5 +27,17 @@ export type StatusPage = {
 export type StatusPageState = {
   statusPages: StatusPage[];
   error?: string | null;
+  lastAction?: StatusPageActionIntent;
   success?: boolean;
 };
+
+export type StatusPageModalState =
+  | { mode: "closed" }
+  | { mode: "create" }
+  | { mode: "edit"; statusPage: StatusPage };
+
+export enum StatusPageActionIntent {
+  CREATE = "create",
+  DELETE = "delete",
+  UPDATE = "update",
+}
