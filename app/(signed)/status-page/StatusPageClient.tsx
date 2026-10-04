@@ -272,7 +272,7 @@ const StatusPageClient = ({
                               <span className="text-foreground font-medium">{monitor.name}</span>
                             </td>
                             <td className="px-5 py-3 align-top">
-                              <span className="text-muted-foreground max-w-[14rem] truncate font-mono text-xs">
+                              <span className="text-muted-foreground max-w-56 truncate font-mono text-xs">
                                 {monitor.url}
                               </span>
                             </td>

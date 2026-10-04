@@ -31,4 +31,4 @@ export enum MonitorActionIntent {
   UPDATE = "update",
 }
 export type HttpMethod = "GET" | "POST" | "HEAD";
-export type MonitorStatus = "PENDING" | "UP" | "DOWN";
+export type MonitorStatus = "PENDING" | "UP" | "DOWN" | "EMPTY";
