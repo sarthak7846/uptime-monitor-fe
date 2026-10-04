@@ -4,7 +4,7 @@ import Link from "next/link";
 import { IncidentStatus } from "@/app/(signed)/incident/types";
 import { MonitorStatus } from "@/app/(signed)/monitor/types";
 import ChannelBadge from "@/components/ChannelBadge";
-import { dashboardMonitors, dashboardNotifications } from "./mock-data";
+import { dashboardMonitors } from "./mock-data";
 import { DashboardState } from "./types";
 
 const monitorStatusStyles: Record<MonitorStatus, string> = {
@@ -70,10 +70,7 @@ const StatCard = ({
 };
 
 const DashboardClient = ({ initialDashboardState }: { initialDashboardState: DashboardState }) => {
-  const { monitors, incidents } = initialDashboardState;
-  // const monitors = dashboardMonitors;
-  // const incidents = dashboardIncidents;
-  const { endpoints } = dashboardNotifications;
+  const { monitors, incidents, endpoints } = initialDashboardState;
 
   const statusCounts = monitors.reduce(
     (acc, m) => {
@@ -191,7 +188,7 @@ const DashboardClient = ({ initialDashboardState }: { initialDashboardState: Das
                   <tr key={monitor.id} className="hover:bg-muted/40">
                     <td className="px-4 py-2.5">
                       <span className="text-foreground font-medium">{monitor.name}</span>
-                      <p className="text-muted-foreground max-w-[200px] truncate text-xs sm:max-w-none">
+                      <p className="text-muted-foreground max-w-50 truncate text-xs sm:max-w-none">
                         {monitor.url}
                       </p>
                     </td>

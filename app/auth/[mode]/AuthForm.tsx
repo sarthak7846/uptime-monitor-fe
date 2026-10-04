@@ -1,26 +1,42 @@
 "use client";
 
 import Link from "next/link";
-import { signInAction } from "../actions";
+import { authAction } from "../actions";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type AuthFormProps = {
   mode: "signin" | "signup";
 };
 
 export function AuthForm({ mode }: AuthFormProps) {
+  const router = useRouter();
   const isSignUp = mode === "signup";
-  const [state, action, pending] = useActionState(signInAction, null);
+  const [state, action, pending] = useActionState(authAction.bind(null, mode), null);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (!state?.message) return;
-    toast.error(state?.message);
-  }, [state?.message]);
+  if (!state?.message) return;
+
+  if (state.success) {
+    toast.success(state.message);
+
+    setTimeout(() => {
+      router.push("/auth/signin");
+    }, 1000);
+
+    return;
+  }
+
+  toast.error(state.message);
+}, [state]);
 
   return (
     <div className="bg-muted/30 flex min-h-svh flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[400px]">
+      <div className="w-full max-w-100">
         <div className="border-border bg-card rounded-2xl border p-8 shadow-sm">
           <div className="mb-8 text-center">
             <h1 className="text-foreground text-2xl font-semibold tracking-tight">
@@ -80,15 +96,27 @@ export function AuthForm({ mode }: AuthFormProps) {
                   </Link>
                 )}
               </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                required
-                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-lg border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-              />
+
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  required
+                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-lg border px-3 py-2 pr-10 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <button
